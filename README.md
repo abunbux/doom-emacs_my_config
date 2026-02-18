@@ -1,39 +1,24 @@
-# -*- mode: org; -*-
-:PROPERTIES:
-:CUSTOM_ID: Установка
-:END:
-#+TITLE: README
-#+DESCRIPTION:
-#+KEYWORDS: emacs
-#+AUTHOR:
-#+email:
-#+INFOJS_OPT:
-#+STARTUP:  content
+
 
 #+DATE: CREATED: <Ср фев 18 12:01:05 MSK 2026>
-#+DATE: Time-stamp: <Последнее обновление -- Среда февраля 18 17:50:44 MSK 2026>
+#+DATE: Time-stamp: <Последнее обновление -- Среда февраля 18 18:7:31 MSK 2026>
 
-*Содержание*:
-[[#Установка][Установка]]
-
-
+### Table of Contents
+-[Установка](#установка)
 
 
 
-* Установка
-:PROPERTIES:
-:CUSTOM_ID: Установка
-:END:
+
+# Установка
+
 Сперва, понятное дело, нужен сам /emacs/.
 Затем идём на [[https://github.com/doomemacs/doomemacs][страничку doomemacs на github]] и устанавливаем.
 Обычно это:
 
-#+begin_src shell
-
+``` shell
 git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 ~/.config/emacs/bin/doom install
-
-#+end_src
+```
 
 Первой командой мы клонируем репозиторий /doomemacs/ в директорию ~/.config/emacs.
 Вторая добавит нам директорию ~/.config/doom с тремя файлами:
@@ -44,12 +29,10 @@ git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
 
 Затем уже клонируем этот репозиторий.
 
-#+begin_src shell
-
-git clone https://github.com/abunbux/doom-emacs_my_config.git 
-
-#+end_src
+``` shell
+git clone https://github.com/abunbux/doom-emacs_my_config.git
+```
 
 При клонировании можно пойти двумя путями. Либо сперва удалить все файлы из директории *~/config/doom/* и клонироваться прямиком туда.
 Либо, что было бы более правильно, создать временную папку с любым наименованием, залить репозиторий туда и сперва сравнить файлы, созданные ранее
-при установке /doomemacs/ (config.el, init.el, packages.el) в директории *~/config/doom/* с такими же, но во временной папке.
+при установке *doomemacs* (config.el, init.el, packages.el) в директории *~/config/doom/* с такими же, но во временной папке.
