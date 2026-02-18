@@ -1,7 +1,7 @@
 
 
 #+DATE: CREATED: <Ср фев 18 12:01:05 MSK 2026>
-#+DATE: Time-stamp: <Последнее обновление -- Среда февраля 18 18:7:31 MSK 2026>
+#+DATE: Time-stamp: <Последнее обновление -- Среда февраля 18 18:13:8 MSK 2026>
 
 ### Table of Contents
 -[Установка](#установка)
@@ -12,7 +12,7 @@
 # Установка
 
 Сперва, понятное дело, нужен сам /emacs/.
-Затем идём на [[https://github.com/doomemacs/doomemacs][страничку doomemacs на github]] и устанавливаем.
+Затем идём на [страничку doomemacs на github](https://github.com/doomemacs/doomemacs) и устанавливаем.
 Обычно это:
 
 ``` shell
