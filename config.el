@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Среда февраля 18 18:41:24 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Среда февраля 18 22:2:39 MSK 2026>
 
 
 
@@ -140,10 +140,19 @@
 (define-key global-map [(insert)] nil)
 
 
+
+
 ;; Функция Emacs Lisp display-startup-echo-area-message отвечает за отображение начального
 ;; стартового сообщения в эхо-области (области минибуфера) при запуске Emacs.
 ;; Сообщение по умолчанию обычно следующее: «Для получения информации о GNU Emacs и системе GNU введите C-h C-a».
 (fset 'display-startup-echo-area-message #'ignore)
+
+
+
+
+
+
+
 
 
 
@@ -277,14 +286,74 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(setq vc-make-backup-files          t)                 ; vc-hooks.el
-(setq ad-redefinition-action            'accept                     ; advice.el
-      auto-revert-verbose               t                           ; autorevert.el
-      compilation-always-kill           t                           ; compile.el
-      x-select-enable-clipboard         t                           ; select.el
-      x-select-enable-primary           nil                         ; select.el
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                                                           ;;
+;;                          РЕДАКТИРОВАНИЕ                                   ;;
+;;                                                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Встроенная функция для перемещения линии `drag-stuff-down' - `M-<down>' 
+;; Встроенная функция для дублирования линии `duplicate-line',
+;; Встроенная функция для дублирования линии или выделения `duplicate-dwim': 
+(bind-key "C-x <down>" 'duplicate-dwim)
+
+
+;; indent buffer-region
+;; https://github.com/djui/dot-files/blob/master/dot-emacs ****************
+;; my/indent-region-or-buffer ("C-M-\\")
+(defun my/indent-buffer ()
+  "Indent the currently visited buffer."
+  (interactive)
+  (indent-region (point-min) (point-max)))
+(defun my/indent-region-or-buffer ()
+  "Indent a region if selected, otherwise the whole buffer."
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (progn
+          (indent-region (region-beginning) (region-end))
+          (message "Indented selected region."))
+      (progn
+        (my/indent-buffer)
+        (message "Indented buffer.")))))
+(bind-key "C-M-\\" 'my/indent-region-or-buffer)
+
+
+;; Если есть выделение - комментирует выделение, если выделения нет - комментирует строку.
+;; https://github.com/rigidus/.emacs.d/blob/master/init.el
+;; my/comment-or-uncomment-this ("C-x /")
+(defun my/comment-or-uncomment-this (&optional lines)
+  (interactive "P")
+  (if mark-active
+      (if (< (mark) (point))
+          (comment-or-uncomment-region (mark) (point))
+        (comment-or-uncomment-region (point) (mark)))
+    (comment-or-uncomment-region
+     (line-beginning-position)
+     (line-end-position lines))))
+(bind-key "C-x /" 'my/comment-or-uncomment-this)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+
+
+
+(setq vc-make-backup-files              t)                      ; vc-hooks.el
+(setq ad-redefinition-action            'accept                 ; advice.el
+      auto-revert-verbose               t                       ; autorevert.el
+      compilation-always-kill           t                       ; compile.el
+      select-enable-clipboard           t                       ; select.el
+      select-enable-primary             nil                     ; select.el
       )
-(setq read-file-name-completion-ignore-case t)                      ; minibuffer.el
+(setq read-file-name-completion-ignore-case t)                  ; minibuffer.el
 (minibuffer-depth-indicate-mode)  
 
 ;; Если значение переменной sentence-end равно nil (по умолчанию),
