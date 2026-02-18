@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: binary
+# key: bi
+# --
+<binary id="$1" content-type="image/jpeg">

@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# contributor: Daniel Hitzel & abunbux
+# name: use-package
+# key: up
+# --
+(use-package ${1:package-name}
+    :defer t
+    :commands
+    :bind (
+            ()
+    )
+    :init
+    :config
+    (message "Loading \"${2:mode-name}\"")
+    )

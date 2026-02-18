@@ -1,0 +1,61 @@
+# -*- mode: snippet -*-
+# name: nfo-whole
+# key: nfo
+# --
+<?xml version="1.0" encoding="utf-8"?>
+<movie>
+    <title></title>
+    <sorttitle></sorttitle>
+    <set></set>
+    <studio></studio>
+    <year></year>
+    <runtime></runtime>
+    <mpaa></mpaa>
+
+    <outline></outline>
+    <plot></plot>
+    <tagline></tagline>
+
+    <rating>0</rating>
+    <votes>0</votes>
+    <top250>0</top250>
+    <id></id>
+
+    <thumb></thumb>
+    <filenameandpath></filenameandpath>
+    <trailer></trailer>
+
+    <genre>Action</genre>
+    <genre>Adventure</genre>
+    <genre>Animation</genre>
+    <genre>Biography</genre>
+    <genre>Comedy</genre>
+    <genre>Crime</genre>
+    <genre>Documentary</genre>
+    <genre>Drama</genre>
+    <genre>Family</genre>
+    <genre>Fantasy</genre>
+    <genre>Film-Noir</genre>
+    <genre>History</genre>
+    <genre>Horror</genre>
+    <genre>Music</genre>
+    <genre>Musical</genre>
+    <genre>Mystery</genre>
+    <genre>Romance</genre>
+    <genre>Sci-Fi</genre>
+    <genre>Sport</genre>
+    <genre>Thriller</genre>
+    <genre>War</genre>
+    <genre>Western</genre>
+
+    <tag></tag>
+
+    <director></director>
+    <credits></credits>
+    <actor>
+        <name></name>
+        <role></role>
+    </actor>
+
+    <playcount>0</playcount>
+</movie>

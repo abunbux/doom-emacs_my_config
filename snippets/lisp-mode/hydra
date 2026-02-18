@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# contributor: abunbux
+# name: defhydra
+# key: dhy
+# --
+(defhydra ${1:my/name} (:color blue :hint nil)
+    "
+${2:package-name}:     _q_uit
+    
+"
+    ("${3:litera}" ${4:command})
+    ("q" nil))

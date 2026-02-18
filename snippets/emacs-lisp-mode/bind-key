@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor : abunbux
+# name : bind-key
+# key: bind-key
+# key : bk
+# --
+(bind-key "${1:start}" '${2:end})

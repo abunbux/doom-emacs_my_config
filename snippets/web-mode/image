@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: image
+# key: image
+# --
+<image l:href="#$1"/>

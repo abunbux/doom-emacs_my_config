@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor : abunbux
+# name : global-set-key-super
+# key: global-set-key-super
+# key : gsks
+# --
+(global-set-key [(super ${1:start})] ')

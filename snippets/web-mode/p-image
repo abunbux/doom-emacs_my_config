@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: p-image-/p
+# key: pi
+# --
+<p><image l:href="#$1"/></p>

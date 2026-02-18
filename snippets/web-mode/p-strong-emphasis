@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: <p><strong><emphasis>
+# key: pse
+# --
+<p><strong><emphasis>$1</emphasis></strong></p>
