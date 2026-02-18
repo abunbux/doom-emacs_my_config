@@ -1,10 +1,10 @@
 ---
 title: "Название вашего проекта"
-author: "Ваше Имя"
+author: "abunbux"
 date: CREATED <Ср фев 18 12:01:05 MSK 2026>
-Time-stamp: <Последнее обновление -- Среда февраля 18 18:18:4 MSK 2026>
-description: "Краткое описание README"
-tags: [git, markdown, guide]
+Time-stamp: <Последнее обновление -- Среда февраля 18 18:21:53 MSK 2026>
+description: "Пространные рассуждения по установке и использованию"
+tags: [emacs, doomemacs, guide]
 ---
 
 ### Содержание
