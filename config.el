@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Вторник февраля 17 19:26:50 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Среда февраля 18 17:56:33 MSK 2026>
 
 
 
@@ -309,6 +309,10 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 (with-eval-after-load 'corfu
   (setq tab-always-indent nil))
+
+
+
+(setq org-hide-emphasis-markers t)
 
 
 
