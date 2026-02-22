@@ -1,13 +1,17 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Среда февраля 18 22:2:39 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Воскресенье февраля 22 14:21:22 MSK 2026>
+
+
+;;; Commentary:
 
 
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
+;;; Code:
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
@@ -79,29 +83,7 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (message "-----------------------------------------------")
-            (message "Emacs ready in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)
-            (message "-----------------------------------------------")
-            ))
-
-
-
-;;; засекаем время начала загрузки
-(setq emacs-load-start-time (current-time))
-
-
-;;; выводим в буфер сообщений
-(message "start .init loading")
-(message "---------------------------------------------------------")
-
-
-(defconst emacs-start-time (current-time))
+(setq force-load-messages t) ; Показывает в логах каждый загружаемый .el/.elc файл
 
 (setq-default initial-frame-alist   (quote    ((fullscreen . maximized))))
 
@@ -109,6 +91,22 @@
       doom-variable-pitch-font (font-spec :family "DejaVu Sans" :size 22)
       doom-symbol-font (font-spec :family "FiraCode Nerd Font Mono")
       doom-big-font (font-spec :family "JetBrainsMono" :size 24))
+
+;; Назначаем `Symbola' фолбэк-шрифтом (fallback).
+;; Это значит: если основной шрифт не знает какой-то символ (стрелку, эмодзи, редкий глиф),
+;; Emacs автоматически возьмет его из Symbola:
+(defun setup-unicode-fallback-h ()
+  (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'append))
+(add-hook 'doom-init-ui-hook #'setup-unicode-fallback-h)
+
+;; Что делает этот `🡅' код:
+;;      'unicode        - указывает Emacs использовать этот шрифт для всех символов,
+;;                      которые не входят в базовую латиницу/кириллицу.
+;;      'append         - важнейший параметр. Он ставит Symbola в конец очереди.
+;;                      Сначала Emacs ищет символ в вашем основном шрифте (например, JetBrains Mono),
+;;                      и только если его там нет - лезет в Symbola.
+;;      doom-init-ui-hook - гарантирует, что настройка применится после того, как Doom загрузит свои стандартные шрифты.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq-default cursor-type     '(bar . 3))
 
@@ -149,23 +147,21 @@
 
 
 
-
-
-
-
-
-
-
-(use-package emacs
+(use-package! emacs
   :custom
-  (global-visual-line-mode              t)
+  ;; Выход из emacs без вопросов.
+  ;; Даже с этой настройкой Emacs всё равно спросит:
+  ;; Save file ...? (y, n, !, ., q, C-r or C-h), если у вас есть изменения в файлах.
+  ;; Процессы: Если запущены активные процессы (например, терминал shell или компиляция),
+  ;; Emacs спросит: Active processes exist; kill them and exit anyway?.
+  (confirm-kill-emacs                   nil)
   (kill-whole-line                      t)
   (kill-ring-max                        1000)
-  (next-line-add-newlines               nil)
-                                        ; simple.el
   ;; Allows navigation through the mark ring by doing C-u C-SPC once, then C-SPC
   ;; C-SPC.  instead of C-u C-SPC C-u C-SPC C-u C-SPC ...
   (set-mark-command-repeat-pop          t)
+  (mark-ring-max                        64)
+  (global-mark-ring-max                 64)
   (save-interprogram-paste-before-kill  t)
   (blink-matching-paren-distance        nil)
   (interprogram-cut-function            (and (fboundp #'x-select-text)
@@ -190,15 +186,15 @@
   (max-specpdl-size                     10000)
   (right-margin-width                   0)
   (read-buffer-completion-ignore-case   t)
+  (select-enable-clipboard              t)
+  (select-enable-primary                nil)
   (scroll-conservatively                100000)
   (scroll-margin                        3)
   (scroll-step                          1)
   (select-active-regions                t)
-
   (truncate-partial-width-windows       nil)
   (visible-bell                         nil)
   (visible-cursor                       nil)
-
   (x-stretch-cursor                     t)
   (use-dialog-box                       nil)
 
@@ -217,11 +213,11 @@
   (setq scroll-preserve-screen-position 'always)
   )
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                           ;;
-;;                          ЛОКАЛЬ, ВРЕМЯ                                    ;;
-;;                                                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;                          ЛОКАЛЬ, ВРЕМЯ                                  ;;;
+;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Чтобы не возникало ниже написанного:
@@ -269,10 +265,9 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;; <Последнее обновление -- Sunday September 24 23:32:21 EEST 2017>"
 ;; in the first 15 lines of the file,
 ;; emacs will write time-stamp information there when saving the file.
-(use-package time-stamp
+(use-package! time-stamp
   :hook
   (before-save . time-stamp)
-
   :config
   (message "Loading built-in \"time-stamp\"")
   (setq time-stamp-active         t)
@@ -281,21 +276,52 @@ Uses `current-date-time-format' for the formatting the date/time."
   (setq time-stamp-format "Последнее обновление -- %:a %:b %:d %:H:%:M:%:S %:Z %:Y")
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package! reverse-im
+  :config
+  (reverse-im-activate "russian-computer")
+  (message "Loading \"reverse-im\""))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;                    БЛОК  ЛОКАЛЬ, ВРЕМЯ ЗАКОНЧИЛСЯ                       ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                                                                           ;;
-;;                          РЕДАКТИРОВАНИЕ                                   ;;
-;;                                                                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;                          РЕДАКТИРОВАНИЕ                                 ;;;
+;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Встроенная функция для перемещения линии `drag-stuff-down' - `M-<down>' 
+;; Если значение переменной sentence-end равно nil (по умолчанию),
+;; Emacs вычисляет конец предложения динамически на основе sentence-end-double-space.
+;; Если же вы хотите задать свои правила (например, добавить специфические символы),
+;; вы можете присвоить этой переменной строку с регулярным выражением.
+(setq  sentence-end
+       "\\([。、！？]\\|……\\|[,.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
+
+;; У нас не принято разделять предложения двойным пробелом:
+;; Emacs традиционно ожидает два пробела после точки, чтобы отличить конец
+;; предложения от сокращения (например, «т. е.»).
+;; Если вы предпочитаете современный стиль с одним пробелом, установите:
+(setq sentence-end-double-space   nil)
+
+
+(setq tab-width         4)
+(setq-default indent-line-function  'insert-tab                     ; indent.el
+              sh-basic-offset       4                               ; sh-script.el
+              tab-always-indent     nil                             ; indent.el
+              )
+
+
+;; Встроенная функция для перемещения линии `drag-stuff-down' - `M-<down>'
 ;; Встроенная функция для дублирования линии `duplicate-line',
-;; Встроенная функция для дублирования линии или выделения `duplicate-dwim': 
+;; Встроенная функция для дублирования линии или выделения `duplicate-dwim':
 (bind-key "C-x <down>" 'duplicate-dwim)
 
 
@@ -335,90 +361,363 @@ Uses `current-date-time-format' for the formatting the date/time."
 (bind-key "C-x /" 'my/comment-or-uncomment-this)
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;; delsel.el
+(bind-key "C-g" 'minibuffer-keyboard-quit mode-specific-map)
 
+;;; Работа с выделением.
+;;; При существующем выделении (region) нажатие:
+;;;     -d	Удалить region;
+;;;     -w	Скопировать region;
+;;;     -c	Дублировать, то есть скопировать и сразу вставить.
 
+(bind-key
+ (kbd "d")
+ (lambda (arg)
+   (interactive "p")
+   (if (region-active-p)
+       (delete-active-region)
+     (self-insert-command arg))))
 
+(bind-key
+ (kbd "w")
+ (lambda (arg)
+   (interactive "p")
+   (if (region-active-p)
+       (call-interactively 'kill-ring-save)
+     (self-insert-command arg))))
 
+(bind-key
+ (kbd "c")
+ (lambda (arg)
+   (interactive "p")
+   (if (region-active-p)
+       (let ((str (buffer-substring-no-properties
+                   (region-beginning)
+                   (region-end))))
+         (goto-char (region-end))
+         (insert "\n" str))
+     (self-insert-command arg))))
 
-
-
-(setq vc-make-backup-files              t)                      ; vc-hooks.el
-(setq ad-redefinition-action            'accept                 ; advice.el
-      auto-revert-verbose               t                       ; autorevert.el
-      compilation-always-kill           t                       ; compile.el
-      select-enable-clipboard           t                       ; select.el
-      select-enable-primary             nil                     ; select.el
-      )
-(setq read-file-name-completion-ignore-case t)                  ; minibuffer.el
-(minibuffer-depth-indicate-mode)  
-
-;; Если значение переменной sentence-end равно nil (по умолчанию),
-;; Emacs вычисляет конец предложения динамически на основе sentence-end-double-space.
-;; Если же вы хотите задать свои правила (например, добавить специфические символы),
-;; вы можете присвоить этой переменной строку с регулярным выражением. 
-(setq  sentence-end
-       "\\([。、！？]\\|……\\|[,.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
-
-;; У нас не принято разделять предложения двойным пробелом:
-;; Emacs традиционно ожидает два пробела после точки, чтобы отличить конец
-;; предложения от сокращения (например, «т. е.»).
-;; Если вы предпочитаете современный стиль с одним пробелом, установите:
-(setq sentence-end-double-space   nil)
-
-
-(setq tab-width         4)
-(setq-default indent-line-function  'insert-tab                     ; indent.el
-              sh-basic-offset       4                               ; sh-script.el
-              tab-always-indent     nil                             ; indent.el
-              )
 
 (with-eval-after-load 'corfu
   (setq tab-always-indent nil))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;                РАЗДЕЛ РЕДАКТИРОВАНИЯ ЗДЕСЬ ЗАКОНЧИЛСЯ                   ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;             ИСТОРИЯ, РЕЗЕРВНЫЕ КОПИИ, КОНТРОЛЬ ВЕРСИЙ                   ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; Emacs переменная `auto-save-list-file-name' указывает на файл, в котором Emacs
+;; регистрирует список всех текущих файлов автосохранения для восстановления
+;; сессии после сбоя.
+;; При запуске команда M-x `recover-session' читает этот файл, чтобы найти все
+;; несохраненные данные и предложить их восстановить.
+;; Если вдруг захотелось странного - отключить создание этого файла,
+;; раскомментируй это `🡇':
+;; (setq auto-save-list-file-name      nil)
+
+;; savehist
+(use-package! savehist
+  :hook (after-init . savehist-mode)
+  :config
+  (message "Loading built-in \"savehist\"")
+  (setq savehist-additional-variables
+        '(command-history
+          file-name-history
+          global-mark-ring
+          kill-ring
+          mark-ring
+          minibuffer-history
+          regexp-history
+          read-expression-history
+          regexp-search-ring
+          ring
+          savehist-minibuffer-history-variables
+          search
+          search-ring
+          set-variable-value-history
+          shell-command-history))
+  (setq savehist-file (concat doom-cache-dir "savehist")
+        ;; ;; По умолчанию `savehist-autosave-interval' имеет значение 300,
+        ;; ;; пусть так и остаётся
+        ;; savehist-autosave-interval           60
+        savehist-save-minibuffer-history        t
+        history-length                          1000
+        history-delete-duplicates               t)
+  )
+
+
+
+
+(after! files
+  (use-package! files
+    :hook
+    (before-save . delete-trailing-whitespace)
+    ;; (before-save . whitespace-cleanup)
+    (before-save . force-backup-of-buffer)
+    :custom
+    ;; 1. Бэкапы и Автосохранение (в кэш Doom, чтобы не мусорить):
+    ;; Отключаем файлы блокировки (.#)
+    (create-lockfiles                 nil)
+    (make-backup-files                t)
+    ;; Эта настройка заставляет Emacs создавать резервные копии
+    ;; (те самые файлы с тильдой ~ в конце) даже для тех файлов,
+    ;; которые уже находятся под управлением системы контроля версий (Git, SVN и др.)
+    (vc-make-backup-files             t)
+    (version-control                  t)
+    (backup-by-copying                t)
+    (backup-by-copying-when-linked    t)
+    (backup-by-copying-when-mismatch  t)
+    (delete-old-versions              t)
+    (kept-new-versions                40)
+    (kept-old-versions                10)
+
+    ;; 2. Поведение интерфейса и процессов
+    (auto-revert-verbose t)
+    (compilation-always-kill t)
+    (ad-redefinition-action 'accept)
+
+    :config
+    (message "Loading built-in \"files\"")
+    (setq backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/"))))
+    (setq-default find-file-visit-truename t)
+
+    ;; force-backup-of-buffer ()
+    (defun force-backup-of-buffer ()
+      ;; Make a special "per session" backup at the first save of each
+      ;; emacs session.
+      (when (not buffer-backed-up)
+        ;; Override the default parameters for per-session backups.
+        (let ((backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/per-session"))))
+              (kept-new-versions 10))
+          (backup-buffer)))
+      ;; Make a "per save" backup on each save.  The first save results in
+      ;; both a per-session and a per-save backup, to keep the numbering
+      ;; of per-save backups consistent.
+      (let ((buffer-backed-up nil))
+        (backup-buffer)))
+    ))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;      БЛОК ИСТОРИЯ, РЕЗЕРВНЫЕ КОПИИ, КОНТРОЛЬ ВЕРСИЙ  ЗАКОНЧИЛСЯ         ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;           ПОДСКАЗКИ, СОРТИРОВКА И ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ               ;;;
+;;;
+;;; vertico - это современный и минималистичный интерфейс для автодополнения в минибуфере.
+;;;             В отличие от Ivy или Helm, он не переписывает стандартные функции Emacs,
+;;;             а использует встроенный механизм completing-read, что делает его очень
+;;;             быстрым и стабильным.
+;;; Обычно Vertico используют не один, а в связке с другими модулями, которые Doom включает
+;;;             автоматически при активации vertico:
+;;; orderless   - позволяет искать компоненты запроса в любом порядке через пробел.
+;;; consult     - предоставляет полезные команды поиска (например, consult-line вместо Swiper или consult-buffer).
+;;; marginalia  - добавляет полезные пояснения в список кандидатов (права доступа к файлам, описания функций).
+;;; позволяет      - embark вызывать контекстные действия для выбранного кандидата (например, удалить файл прямо из списка поиска).
+;;;
+;;;
+;;; corfu - это современный и минималистичный интерфейс для автодополнения в тексте (completion-at-point) для Emacs.
+;;;             В Doom Emacs он является альтернативой стандартному модулю company.
+;;;
+;;;     в терминале M-x `completion-at-point' или `C-M-i'                   ;;;
+;;;     Не забываем:                                                        ;;;
+;;;     M-x `nerd-icons-install-fonts'                                      ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+(with-eval-after-load 'orderless
+  (message "Loading \"orderless\"")
+
+  (setq orderless-matching-styles '(orderless-regexp
+                                    orderless-literal
+                                    ;; Добавляет fuzzy-поиск
+                                    ;; orderless-flex
+                                    ))
+  ;; Чтобы не использовать постоянно flex (fuzzy) поиск будет использована функция,
+  ;; которая включает flex (fuzzy) поиск,когда ставишь в конце запроса `~':
+  (defun my/orderless-dispatch (pattern _index _total)
+    (cond
+     ;; Если слово заканчивается на ~, использовать flex (fuzzy)
+     ((string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 -1)))
+     ;; Если слово начинается на !, использовать исключение (not)
+     ((string-prefix-p "!" pattern)
+      `(orderless-not . ,(substring pattern 1)))))
+
+  (setq orderless-style-dispatchers '(my/orderless-dispatch)
+        ))
+
+
+(use-package! vertico-prescient
+  :after vertico
+  :config
+  ;; Оставляем только сортировку (фреквенцию), отключаем фильтрацию prescient:
+  (setq vertico-prescient-enable-filtering nil)
+  ;; Включаем интеграцию с Vertico
+  (vertico-prescient-mode 1)
+  ;; Включаем сохранение истории выбора между сессиями:
+  (prescient-persist-mode 1)
+  (message "Loading \"vertico-prescient\"")
+  )
+
+;; С помощью пакета corfu-terminal corfu будет нормально работать в консольном режиме:
+(use-package! corfu-terminal
+  :after corfu
+  :config
+  (message "Loading \"corfu-terminal\"")
+  (unless (display-graphic-p)
+    (corfu-terminal-mode +1)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;    БЛОК ПОДСКАЗОК, СОРТИРОВКИ И ОТОБРАЖЕНИЯ РЕЗУЛЬТАТОВ ЗАКОНЧИЛСЯ      ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;             РАБОТА С БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ                   ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Переименовывает текущий буфер
+;; my/rename-current-buffer-file ()
+(defun my/rename-current-buffer-file ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let ((new-name (read-file-name "New name: " filename)))
+        (if (get-buffer new-name)
+            (error "A buffer named '%s' already exists!" new-name)
+          (rename-file filename new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+          (set-buffer-modified-p nil)
+          (message "File '%s' successfully renamed to '%s'"
+                   name (file-name-nondirectory new-name)))))))
+
+
+;; Копирует абсолютный путь к файлу и имя файла.
+;; my/copy-full-file-name-to-clipboard ()
+(defun my/copy-full-file-name-to-clipboard ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+
+;; Копирует имя файла без директории.
+;; my/copy-buffer-file-name-nondirectory ()
+(defun my/copy-buffer-file-name-nondirectory ()
+  (interactive)
+  (kill-new (file-name-nondirectory buffer-file-name)))
+
+
+;; Копирует имя директории.
+;; my/copy-buffer-file-name-directory ()
+(defun my/copy-buffer-file-name-directory ()
+  (interactive)
+  (kill-new (file-name-directory buffer-file-name)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                                                                         ;;;
+;;;      БЛОК РАБОТЫ  С БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ ЗАКОНЧИЛСЯ         ;;;
+;;;                                                                         ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
 
 
+
+(setq read-file-name-completion-ignore-case     t)              ; minibuffer.el
+(setq enable-recursive-minibuffers              t)
+(minibuffer-depth-indicate-mode                 1)
+
+
+(after! markdown-mode
+  (use-package! markdown-mode
+    :init
+    (setq markdown-bold-underscore                t
+          markdown-command                        "pandoc"
+          ;; syntax highlighting for latex fragments
+          markdown-enable-math                    t
+          markdown-enable-wiki-links              t
+          markdown-fontify-code-blocks-natively   t
+          markdown-header-scaling                 t
+          markdown-hide-markup                    nil
+          ;; trigger with `markdown-toggle-url-hiding'
+          markdown-hide-urls                      nil
+          markdown-indent-function                t
+          markdown-italic-underscore              t
+          ;; for compat with org-mode
+          markdown-gfm-uppercase-checkbox         t)
+    ;; (setq markdown-command "multimarkdown")
+    :config
+    (message "Loading \"markdown-mode\"")
+
+    ;; Don't change font in code blocks
+    ;; (set-face-attribute 'markdown-code-face nil
+    ;;                     :inherit nil)
+
+    (custom-set-faces
+     '(markdown-header-delimiter-face   ((t (:foreground "mediumpurple"))))
+     '(markdown-header-face-1           ((t (:foreground "LimeGreen" :weight bold :height 1.0))))
+     '(markdown-header-face-2           ((t (:foreground "lightslateblue" :weight bold :height 1.0))))
+     '(markdown-header-face-3           ((t (:foreground "mediumpurple1" :weight bold :height 1.0))))
+     '(markdown-link-face               ((t (:background "#0e1014" :foreground "#bd93f9"))))
+     '(markdown-list-face               ((t (:foreground "mediumpurple"))))
+     '(markdown-pre-face                ((t (:foreground "#bd98fe"))))
+     )))
 
 
 
 (message "-----------------------------------------------")
 
-(let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
-  (message "Loading %s...done (%.3fs)" load-file-name elapsed))
 
-(message ".init loaded OK.")
-
-(message "Emacs startup time: %g seconds." (float-time (time-since emacs-load-start-time)))
+;; Используем хук Doom, который срабатывает, когда всё точно готово
+(add-hook 'doom-after-init-hook
+          (lambda ()
+            (message "--- Doom ready in %s (GCs: %d) ---"
+                     (emacs-init-time)
+                     gcs-done)))
 
 (message "-----------------------------------------------")
-
-
-
-
-
-
-
-
-
-
-
-
-;;; Finalization
-(add-hook 'after-init-hook
-          `(lambda ()
-             (let ((elapsed (float-time (time-subtract (current-time) emacs-start-time))))
-	       (message "-------------------------------------------------------------------")
-               (message "Loading %s...done (%.3fs) [after-init]" ,load-file-name elapsed))
-             (message "        INITIALIZATION COMPLETED")
-             (message "-------------------------------------------------------------------")) t)
-
-
-
-
