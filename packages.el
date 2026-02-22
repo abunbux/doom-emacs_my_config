@@ -54,3 +54,8 @@
 ;; (unpin! t)
 
 (package! bind-key)
+(package! reverse-im)     ; пакет решает проблему русской раскладки.
+(package! vertico-prescient)
+(package! corfu-terminal
+  :recipe (:type git
+           :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"))
