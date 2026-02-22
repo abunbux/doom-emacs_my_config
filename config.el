@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Воскресенье февраля 22 14:21:22 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Воскресенье февраля 22 16:36:14 MSK 2026>
 
 
 ;;; Commentary:
@@ -139,79 +139,117 @@
 
 
 
+;; Общие настройки интерфейса и поведения:
+(setq-default
+ window-combination-resize       t       ; Новые окна делят место равномерно
+ x-stretch-cursor                t       ; Курсор растягивается на ширину глифа (напр. Tab)
+ scroll-margin                   3       ; Начинать скроллинг за 3 строки до края
+ scroll-step                     1
+ scroll-conservatively           100000
+ delete-by-moving-to-trash       t       ; Удалять в корзину
+ ;; Выход из emacs без вопросов.
+ ;; Даже с этой настройкой Emacs всё равно спросит:
+ ;; Save file ...? (y, n, !, ., q, C-r or C-h), если у вас есть изменения в файлах.
+ ;; Процессы: Если запущены активные процессы (например, терминал shell или компиляция),
+ ;; Emacs спросит: Active processes exist; kill them and exit anyway?.
+ confirm-kill-emacs              nil
+ indent-tabs-mode                nil     ; Использовать пробелы вместо табуляции
+ tab-width                       4)
 
+;; Настройки поиска и регистров:
+(setq   case-fold-search t
+        read-buffer-completion-ignore-case t
+        read-file-name-completion-ignore-case t
+        completion-ignore-case t)
+
+;; Навигация и сохранение позиции:
+(setq   scroll-preserve-screen-position 'always
+        ;; Allows navigation through the mark ring by doing C-u C-SPC once, then C-SPC
+        ;; C-SPC.  instead of C-u C-SPC C-u C-SPC C-u C-SPC ...
+        set-mark-command-repeat-pop t)
+
+;; 2. Настройка бэкапов:
+(setq   make-backup-files               t
+        ;; Эта настройка заставляет Emacs создавать резервные копии
+        ;; (те самые файлы с тильдой ~ в конце) даже для тех файлов,
+        ;; которые уже находятся под управлением системы контроля версий (Git, SVN и др.):
+        vc-make-backup-files            t
+        ;; Отключаем файлы блокировки (.#):
+        create-lockfiles                 nil
+        backup-by-copying               t
+        backup-by-copying-when-linked   t
+        backup-by-copying-when-mismatch t
+        version-control                 t
+        delete-old-versions             t
+        kept-new-versions               40
+        kept-old-versions               10
+        backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/"))))
+
+;; force-backup-of-buffer ()
+(defun my/force-backup-of-buffer ()
+  ;; Make a special "per session" backup at the first save of each
+  ;; emacs session.
+  (when (not buffer-backed-up)
+    ;; Override the default parameters for per-session backups.
+    (let ((backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/per-session"))))
+          (kept-new-versions 5))
+      (backup-buffer)))
+  ;; Make a "per save" backup on each save.  The first save results in
+  ;; both a per-session and a per-save backup, to keep the numbering
+  ;; of per-save backups consistent.
+  (let ((buffer-backed-up nil))
+    (backup-buffer)))
+
+;; Автоматизация при сохранении
+(add-hook 'before-save-hook #'my/force-backup-of-buffer)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
+;; (add-hook 'before-save-hook #'whitespace-cleanup)
+
+
+
+;; Savehist (улучшенное сохранение истории)
+;; В Doom модуль (:ui workspaces) или (:completion ...) уже могут включать savehist,
+;; но ручная донастройка переменных полезна:
+(after! savehist
+  (setq history-length                          1000
+        savehist-save-minibuffer-history        t
+        history-delete-duplicates               t
+        savehist-additional-variables           '(command-history
+                                                  minibuffer-history
+                                                  file-name-history
+                                                  kill-ring
+                                                  mark-ring
+                                                  global-mark-ring
+                                                  search-ring
+                                                  regexp-search-ring
+                                                  regexp-history
+                                                  read-expression-history
+                                                  shell-command-history)))
+
+;; Emacs переменная `auto-save-list-file-name' указывает на файл, в котором Emacs
+;; регистрирует список всех текущих файлов автосохранения для восстановления
+;; сессии после сбоя.
+;; При запуске команда M-x `recover-session' читает этот файл, чтобы найти все
+;; несохраненные данные и предложить их восстановить.
+;; Если вдруг захотелось странного - отключить создание этого файла,
+;; раскомментируй это `🡇':
+;; (setq auto-save-list-file-name      nil)
+
+
+
+;; Минибуфер
+(setq enable-recursive-minibuffers      t)
+(minibuffer-depth-indicate-mode         1)
+
+
+
+;; Исправление/Оптимизация специфичных вещей.
 ;; Функция Emacs Lisp display-startup-echo-area-message отвечает за отображение начального
 ;; стартового сообщения в эхо-области (области минибуфера) при запуске Emacs.
 ;; Сообщение по умолчанию обычно следующее: «Для получения информации о GNU Emacs и системе GNU введите C-h C-a».
 (fset 'display-startup-echo-area-message #'ignore)
 
 
-
-(use-package! emacs
-  :custom
-  ;; Выход из emacs без вопросов.
-  ;; Даже с этой настройкой Emacs всё равно спросит:
-  ;; Save file ...? (y, n, !, ., q, C-r or C-h), если у вас есть изменения в файлах.
-  ;; Процессы: Если запущены активные процессы (например, терминал shell или компиляция),
-  ;; Emacs спросит: Active processes exist; kill them and exit anyway?.
-  (confirm-kill-emacs                   nil)
-  (kill-whole-line                      t)
-  (kill-ring-max                        1000)
-  ;; Allows navigation through the mark ring by doing C-u C-SPC once, then C-SPC
-  ;; C-SPC.  instead of C-u C-SPC C-u C-SPC C-u C-SPC ...
-  (set-mark-command-repeat-pop          t)
-  (mark-ring-max                        64)
-  (global-mark-ring-max                 64)
-  (save-interprogram-paste-before-kill  t)
-  (blink-matching-paren-distance        nil)
-  (interprogram-cut-function            (and (fboundp #'x-select-text)
-                                             #'x-select-text))
-  (interprogram-paste-function          (and (fboundp #'x-selection-value)
-                                             #'x-selection-value))
-  (inhibit-x-resources                  t)
-
-  ;; Не сжимать кеши шрифтов во время сборки мусора.
-  ;; Это нужно при «doom-modeline», если есть проблема с притормаживанием.
-  ;; Я ничего не заметил, но на всякий пожарный случай поставил.
-  (inhibit-compacting-font-caches       t)
-
-  (completion-ignore-case               t)
-  (delete-by-moving-to-trash            t)
-  (focus-follows-mouse                  t)
-  (indicate-empty-lines                 t)
-  (indicate-buffer-boundaries   '((bottom . right)))
-  (left-margin-width                    0)
-  (max-lisp-eval-depth                  5000)
-  (max-mini-window-height               0.5)
-  (max-specpdl-size                     10000)
-  (right-margin-width                   0)
-  (read-buffer-completion-ignore-case   t)
-  (select-enable-clipboard              t)
-  (select-enable-primary                nil)
-  (scroll-conservatively                100000)
-  (scroll-margin                        3)
-  (scroll-step                          1)
-  (select-active-regions                t)
-  (truncate-partial-width-windows       nil)
-  (visible-bell                         nil)
-  (visible-cursor                       nil)
-  (x-stretch-cursor                     t)
-  (use-dialog-box                       nil)
-
-  :config
-  (message "Loading built-in \"emacs\"")
-  (setq-default indent-tabs-mode        nil
-                tab-width               4)
-
-  (setq-default truncate-lines t)
-
-  ;; ignore case
-  (setq-default case-fold-search        t)
-
-  ;; C-v и M-v не отменяют друг друга, потому что положение точки не сохраняется.
-  ;; Исправим это.
-  (setq scroll-preserve-screen-position 'always)
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -407,115 +445,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;                                                                         ;;;
 ;;;                РАЗДЕЛ РЕДАКТИРОВАНИЯ ЗДЕСЬ ЗАКОНЧИЛСЯ                   ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;             ИСТОРИЯ, РЕЗЕРВНЫЕ КОПИИ, КОНТРОЛЬ ВЕРСИЙ                   ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; Emacs переменная `auto-save-list-file-name' указывает на файл, в котором Emacs
-;; регистрирует список всех текущих файлов автосохранения для восстановления
-;; сессии после сбоя.
-;; При запуске команда M-x `recover-session' читает этот файл, чтобы найти все
-;; несохраненные данные и предложить их восстановить.
-;; Если вдруг захотелось странного - отключить создание этого файла,
-;; раскомментируй это `🡇':
-;; (setq auto-save-list-file-name      nil)
-
-;; savehist
-(use-package! savehist
-  :hook (after-init . savehist-mode)
-  :config
-  (message "Loading built-in \"savehist\"")
-  (setq savehist-additional-variables
-        '(command-history
-          file-name-history
-          global-mark-ring
-          kill-ring
-          mark-ring
-          minibuffer-history
-          regexp-history
-          read-expression-history
-          regexp-search-ring
-          ring
-          savehist-minibuffer-history-variables
-          search
-          search-ring
-          set-variable-value-history
-          shell-command-history))
-  (setq savehist-file (concat doom-cache-dir "savehist")
-        ;; ;; По умолчанию `savehist-autosave-interval' имеет значение 300,
-        ;; ;; пусть так и остаётся
-        ;; savehist-autosave-interval           60
-        savehist-save-minibuffer-history        t
-        history-length                          1000
-        history-delete-duplicates               t)
-  )
-
-
-
-
-(after! files
-  (use-package! files
-    :hook
-    (before-save . delete-trailing-whitespace)
-    ;; (before-save . whitespace-cleanup)
-    (before-save . force-backup-of-buffer)
-    :custom
-    ;; 1. Бэкапы и Автосохранение (в кэш Doom, чтобы не мусорить):
-    ;; Отключаем файлы блокировки (.#)
-    (create-lockfiles                 nil)
-    (make-backup-files                t)
-    ;; Эта настройка заставляет Emacs создавать резервные копии
-    ;; (те самые файлы с тильдой ~ в конце) даже для тех файлов,
-    ;; которые уже находятся под управлением системы контроля версий (Git, SVN и др.)
-    (vc-make-backup-files             t)
-    (version-control                  t)
-    (backup-by-copying                t)
-    (backup-by-copying-when-linked    t)
-    (backup-by-copying-when-mismatch  t)
-    (delete-old-versions              t)
-    (kept-new-versions                40)
-    (kept-old-versions                10)
-
-    ;; 2. Поведение интерфейса и процессов
-    (auto-revert-verbose t)
-    (compilation-always-kill t)
-    (ad-redefinition-action 'accept)
-
-    :config
-    (message "Loading built-in \"files\"")
-    (setq backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/"))))
-    (setq-default find-file-visit-truename t)
-
-    ;; force-backup-of-buffer ()
-    (defun force-backup-of-buffer ()
-      ;; Make a special "per session" backup at the first save of each
-      ;; emacs session.
-      (when (not buffer-backed-up)
-        ;; Override the default parameters for per-session backups.
-        (let ((backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/per-session"))))
-              (kept-new-versions 10))
-          (backup-buffer)))
-      ;; Make a "per save" backup on each save.  The first save results in
-      ;; both a per-session and a per-save backup, to keep the numbering
-      ;; of per-save backups consistent.
-      (let ((buffer-backed-up nil))
-        (backup-buffer)))
-    ))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;      БЛОК ИСТОРИЯ, РЕЗЕРВНЫЕ КОПИИ, КОНТРОЛЬ ВЕРСИЙ  ЗАКОНЧИЛСЯ         ;;;
 ;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
