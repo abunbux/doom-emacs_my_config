@@ -3,7 +3,7 @@ title: "doom-emacs_my_config"
 url: https://github.com/abunbux/doom-emacs_my_config
 author: "abunbux"
 date: CREATED <Ср фев 18 12:01:05 MSK 2026>
-Time-stamp: <Последнее обновление -- Среда февраля 18 18:53:18 MSK 2026>
+Time-stamp: <Последнее обновление -- Четверг февраля 19 13:22:5 MSK 2026>
 description: "Пространные рассуждения по установке и использованию"
 tags: [emacs, doomemacs, guide]
 -->
