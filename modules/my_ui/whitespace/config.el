@@ -1,14 +1,20 @@
 ;;; my_ui/whitespace/config.el -*- lexical-binding: t; -*-
 
-;;; CREATED: <Пн фев 16 19:13:07 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Понедельник февраля 16 19:13:12 MSK 2026>
+;;; CREATED: <Сб фев 21 20:53:20 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Суббота февраля 21 20:53:44 MSK 2026>
 
+;;; Commentary:
+
+;;; Code:
 
 ;;; whitespace.el
 ;; built-in
-;; "M-h h W"  `whitespace-mode'
+
 (use-package! whitespace
+  :defer t
   :init
+  :config
+  (message "Loading built-in \"whitespace\"")
   (setq whitespace-style
         '(face
           empty
@@ -26,8 +32,4 @@
           (space-mark 160 [164] [95])
           (newline-mark 10 [36 10])
           (tab-mark 9 [187 9] [92 9])))
-  :config
-  (whitespace-mode	-1)
-  (message "Loading built-in \"whitespace\"")
   )
-
