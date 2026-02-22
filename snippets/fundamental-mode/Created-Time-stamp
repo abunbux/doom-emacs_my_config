@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# contributor : abunbux
+# name: Created-Time-stamp
+# key: Created-Time-stamp
+# key: lbts
+# --
+;;; `(my/insert-current-date-time)`
+;;; Time-stamp: <Последнее обновление -- Thursday March 28 18:55:13 EET 2019>
+
