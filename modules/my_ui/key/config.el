@@ -1,7 +1,7 @@
 ;;; my_ui/key/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:12:28 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Четверг февраля 19 16:11:36 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Понедельник февраля 23 14:55:36 MSK 2026>
 
 
 
@@ -42,7 +42,6 @@
     (setq which-key-sort-order                          'which-key-key-order)
 
     ;; (require 'which-key)
-
 
     ;; (setq which-key-highlighted-command-list
     ;;       '(("\\`counsel-"    . ((t (:inherit default :foreground "seashell1"))))

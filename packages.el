@@ -59,3 +59,5 @@
 (package! corfu-terminal
   :recipe (:type git
            :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"))
+(package! backup-walker)
+(package! backup-each-save)

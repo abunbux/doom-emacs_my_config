@@ -199,7 +199,6 @@
        (default +bindings +smartparens)
 
        :my_ui
-       window
        key
        tramp
        whitespace

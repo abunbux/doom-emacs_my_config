@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Воскресенье февраля 22 16:36:14 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Понедельник февраля 23 21:19:2 MSK 2026>
 
 
 ;;; Commentary:
@@ -83,7 +83,8 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(setq force-load-messages t) ; Показывает в логах каждый загружаемый .el/.elc файл
+;; Показывает в логах каждый загружаемый .el/.elc файл
+(setq force-load-messages t)
 
 (setq-default initial-frame-alist   (quote    ((fullscreen . maximized))))
 
@@ -156,6 +157,7 @@
  indent-tabs-mode                nil     ; Использовать пробелы вместо табуляции
  tab-width                       4)
 
+
 ;; Настройки поиска и регистров:
 (setq   case-fold-search t
         read-buffer-completion-ignore-case t
@@ -168,7 +170,7 @@
         ;; C-SPC.  instead of C-u C-SPC C-u C-SPC C-u C-SPC ...
         set-mark-command-repeat-pop t)
 
-;; 2. Настройка бэкапов:
+;; НАСТРОЙКА БЭКАПОВ:
 (setq   make-backup-files               t
         ;; Эта настройка заставляет Emacs создавать резервные копии
         ;; (те самые файлы с тильдой ~ в конце) даже для тех файлов,
@@ -183,7 +185,9 @@
         delete-old-versions             t
         kept-new-versions               40
         kept-old-versions               10
-        backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/"))))
+        backup-directory-alist `(("." . ,(concat doom-cache-dir "backup/")))
+        )
+
 
 ;; force-backup-of-buffer ()
 (defun my/force-backup-of-buffer ()
@@ -205,9 +209,44 @@
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 ;; (add-hook 'before-save-hook #'whitespace-cleanup)
 
+(use-package! backup-walker
+  :commands (backup-walker-start)
+  :config
+  (message "Loading \"backup-walker\""))
 
 
-;; Savehist (улучшенное сохранение истории)
+(use-package backup-each-save
+  :hook
+  (after-save . backup-each-save)
+  :init
+  (defun backup-each-save-filter (filename)
+    (let ((ignored-filenames
+    	   '("\\/cache/auto-save-list"
+             "\\/cache/cache/backup"
+             "\\/cache/undo-tree-history"
+             "^/tmp"
+             "semantic.cache$"
+             "\\.emacs-places$"
+    	     "\\.recentf$"
+             ".newsrc\\(\\.eld\\)?"))
+    	  (matched-ignored-filename nil))
+      (mapc
+       (lambda (x)
+         (when (string-match x filename)
+    	   (setq matched-ignored-filename t)))
+       ignored-filenames)
+      (not matched-ignored-filename)))
+
+  (setq backup-each-save-filter-function 'backup-each-save-filter)
+  (setq backup-each-save-mirror-location "~/.backup-each-save")
+  :config
+  (message "Loading \"backup-each-save\"")
+  ;; (add-hook 'after-save-hook 'backup-each-save)
+  )
+
+
+
+;; SAVEHIST (улучшенное сохранение истории)
 ;; В Doom модуль (:ui workspaces) или (:completion ...) уже могут включать savehist,
 ;; но ручная донастройка переменных полезна:
 (after! savehist
@@ -223,8 +262,10 @@
                                                   search-ring
                                                   regexp-search-ring
                                                   regexp-history
+                                                  register-alist
                                                   read-expression-history
-                                                  shell-command-history)))
+                                                  shell-command-history))
+  (add-to-list 'savehist-additional-variables 'register-alist))
 
 ;; Emacs переменная `auto-save-list-file-name' указывает на файл, в котором Emacs
 ;; регистрирует список всех текущих файлов автосохранения для восстановления
@@ -235,20 +276,25 @@
 ;; раскомментируй это `🡇':
 ;; (setq auto-save-list-file-name      nil)
 
-
-
-;; Минибуфер
-(setq enable-recursive-minibuffers      t)
-(minibuffer-depth-indicate-mode         1)
-
+(save-place-mode        1)
+;; (desktop-save-mode   t)
 
 
 ;; Исправление/Оптимизация специфичных вещей.
 ;; Функция Emacs Lisp display-startup-echo-area-message отвечает за отображение начального
 ;; стартового сообщения в эхо-области (области минибуфера) при запуске Emacs.
-;; Сообщение по умолчанию обычно следующее: «Для получения информации о GNU Emacs и системе GNU введите C-h C-a».
+;; Сообщение по умолчанию обычно следующее: «Для получения информации
+;; о GNU Emacs и системе GNU введите C-h C-a»:
 (fset 'display-startup-echo-area-message #'ignore)
 
+
+;; auto-compression-mode — это режим, который позволяет Emacs «прозрачно» работать
+;; со сжатыми файлами (например, .gz, .bz2, .xz, .zip).
+;; 1. Авто-распаковка: Когда вы открываете файл logs.txt.gz, Emacs сам распаковывает
+;; его в память и показывает содержимое.
+;; 2. Авто-сжатие: При сохранении изменений (C-x C-s) Emacs автоматически упаковывает
+;; файл обратно на диск, используя соответствующий архиватор:
+(auto-compression-mode      t)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -478,7 +524,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
 (with-eval-after-load 'orderless
   (message "Loading \"orderless\"")
 
@@ -535,9 +580,196 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;                                                                         ;;;
-;;;             РАБОТА С БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ                   ;;;
+;;;      РАБОТА С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ        ;;;
 ;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq help-window-select                        t
+      apropos-do-all                            t
+      apropos-sort-by-scores                    t
+      apropos-documentation-sort-by-scores      nil)
+
+
+;; `🡇' Этот код должен был бы указанные буферы (Apropos, Help и так далее)
+;; заставлять открываться строго в текущем окне, но что-то не так сработало
+;; и они открываются справа, что, в общем-то, не так плохо:
+(setq display-buffer-alist
+      (append
+       '(("\\*\\(Apropos\\|Help\\|Messages\\|Man\\|Process List\\|grep\\|occur\\|flymake\\|project-.*\\)\\*"
+          display-buffer-same-window
+          (inhibit-same-window . nil)))
+       display-buffer-alist))
+;; Чтобы наши настройки `display-buffer-same-window' `🡅' работали в Doom Emacs без конфликтов,
+;; нужно «успокоить» встроенную систему `popup'.
+;; Doom использует макрос set-popup-rule!, который имеет приоритет над обычным display-buffer-alist.
+;; :ignore t  заставит Doom игнорировать их и использовать стандартную логику (нашу `display-buffer-alist'):
+(set-popup-rules!
+  '(("^\\*\\(Apropos\\|Help\\|Messages\\|Man\\|grep\\|occur\\)\\*" :ignore t)
+    ("^\\*project-" :ignore t)))
+
+
+
+;; МИНИБУФЕР
+(setq enable-recursive-minibuffers      t)
+(minibuffer-depth-indicate-mode         1)
+
+;; Высота временного буфера зависит от его содержимого:
+(temp-buffer-resize-mode    t)
+
+;; global-eldoc-mode — это глобальный режим, который выводит подсказки
+;; по документации прямо в эхо-область (нижнюю строку) в реальном времени:
+(global-eldoc-mode      -1)
+
+
+
+;; window.el
+;; (bind-key "M-1"     'delete-other-windows)
+;; (bind-key "M-2"     'other-window)
+(use-package! window
+  :bind
+  (("M-1"   .   delete-other-windows)
+   ("M-2"   .   other-window)
+   ("C-x |"  .   my/toggle-window-split)
+
+   ([C-M-down]  . my/win-resize-vert-minimize)
+   ([C-M-up]    . my/win-resize-enlarge-vert)
+   ([C-M-left]  . my/win-resize-minimize-horiz)
+   ([C-M-right] . my/win-resize-enlarge-horiz)
+   ([C-M-up]    . my/win-resize-enlarge-horiz)
+   ([C-M-down]  . my/win-resize-minimize-horiz)
+   ([C-M-left]  . my/win-resize-enlarge-vert)
+   ([C-M-right] . my/win-resize-minimize-vert)
+
+   :map global-map
+   ;; "C-x 3"
+   ([remap split-window-right]  .   my/split-window-right))
+
+  :config
+  (message "Loading built-in \"window\"")
+
+
+  ;; my/split-window-right ("C-x 3")
+  (defun my/split-window-right ()
+    "Делит окно на две части и перемещается во вновь созданное."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  ;; (bind-key [remap split-window-right] 'my/split-window-right global-map)
+
+
+  ;; Переключает отображение фреймов (двух) - с вертикального на горизонтальный и наоборот:
+  ;; my/toggle-window-split ("C-x |")
+  (defun my/toggle-window-split ()
+    "Переключает отображение фреймов (двух) -
+        с вертикального на горизонтальный и наоборот."
+    (interactive)
+    (if (= (count-windows) 2)
+        (let* ((this-win-buffer (window-buffer))
+               (next-win-buffer (window-buffer (next-window)))
+               (this-win-edges (window-edges (selected-window)))
+               (next-win-edges (window-edges (next-window)))
+               (this-win-2nd (not (and (<= (car this-win-edges)
+                                           (car next-win-edges))
+                                       (<= (cadr this-win-edges)
+                                           (cadr next-win-edges)))))
+               (splitter
+                (if (= (car this-win-edges)
+                       (car (window-edges (next-window))))
+                    'split-window-horizontally
+                  'split-window-vertically)))
+          (delete-other-windows)
+          (let ((first-win (selected-window)))
+            (funcall splitter)
+            (if this-win-2nd (other-window 1))
+            (set-window-buffer (selected-window) this-win-buffer)
+            (set-window-buffer (next-window) next-win-buffer)
+            (select-window first-win)
+            (if this-win-2nd (other-window 1))))))
+  ;; (bind-key "C-x |" 'my/toggle-window-split)
+
+  ;; WIN-RESIZE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+  ;; (bind-key [C-M-down]  'my/win-resize-minimize-vert)
+  ;; (bind-key [C-M-up]    'my/win-resize-enlarge-vert)
+  ;; (bind-key [C-M-left]  'my/win-resize-minimize-horiz)
+  ;; (bind-key [C-M-right] 'my/win-resize-enlarge-horiz)
+  ;; (bind-key [C-M-up]    'my/win-resize-enlarge-horiz)
+  ;; (bind-key [C-M-down]  'my/win-resize-minimize-horiz)
+  ;; (bind-key [C-M-left]  'my/win-resize-enlarge-vert)
+  ;; (bind-key [C-M-right] 'my/win-resize-minimize-vert)
+
+  (defun my/win-resize-top-or-bot ()
+    "Figure out if the current window is on top, bottom or in the
+middle"
+    (let* ((win-edges (window-edges))
+           (this-window-y-min (nth 1 win-edges))
+           (this-window-y-max (nth 3 win-edges))
+           (fr-height (frame-height)))
+      (cond
+       ((eq 0 this-window-y-min) "top")
+       ((eq (- fr-height 1) this-window-y-max) "bot")
+       (t "mid"))))
+
+  (defun my/win-resize-left-or-right ()
+    "Figure out if the current window is to the left, right or in the
+middle"
+    (let* ((win-edges (window-edges))
+           (this-window-x-min (nth 0 win-edges))
+           (this-window-x-max (nth 2 win-edges))
+           (fr-width (frame-width)))
+      (cond
+       ((eq 0 this-window-x-min) "left")
+       ((eq (+ fr-width 4) this-window-x-max) "right")
+       (t "mid"))))
+
+  ;; [C-M-right] [C-M-up]
+  (defun my/win-resize-enlarge-horiz ()
+    (interactive)
+    (cond
+     ((equal "top" (my/win-resize-top-or-bot)) (enlarge-window -1))
+     ((equal "bot" (my/win-resize-top-or-bot)) (enlarge-window 1))
+     ((equal "mid" (my/win-resize-top-or-bot)) (enlarge-window -1))
+     (t (message "nil"))))
+
+  ;; [C-M-left] [C-M-down]
+  (defun my/win-resize-minimize-horiz ()
+    (interactive)
+    (cond
+     ((equal "top" (my/win-resize-top-or-bot)) (enlarge-window 1))
+     ((equal "bot" (my/win-resize-top-or-bot)) (enlarge-window -1))
+     ((equal "mid" (my/win-resize-top-or-bot)) (enlarge-window 1))
+     (t (message "nil"))))
+
+  ;; [C-M-up] [C-M-left]
+  (defun my/win-resize-enlarge-vert ()
+    (interactive)
+    (cond
+     ((equal "left" (my/win-resize-left-or-right)) (enlarge-window-horizontally -1))
+     ((equal "right" (my/win-resize-left-or-right)) (enlarge-window-horizontally 1))
+     ((equal "mid" (my/win-resize-left-or-right)) (enlarge-window-horizontally -1))))
+
+  ;; [C-M-down] [C-M-right]
+  (defun my/win-resize-minimize-vert ()
+    (interactive)
+    (cond
+     ((equal "left"   (my/win-resize-left-or-right)) (enlarge-window-horizontally 1))
+     ((equal "right"  (my/win-resize-left-or-right)) (enlarge-window-horizontally -1))
+     ((equal "mid"    (my/win-resize-left-or-right)) (enlarge-window-horizontally 1))))
+
+  ;; WIN-RESIZE ends here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+  )
+
+
+
+
+
+
+
+
+
+
 
 ;; Переименовывает текущий буфер
 ;; my/rename-current-buffer-file ()
@@ -587,19 +819,13 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;                                                                         ;;;
-;;;      БЛОК РАБОТЫ  С БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ ЗАКОНЧИЛСЯ         ;;;
+;;;
+;;; БЛОК РАБОТЫ  С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ ЗАКОНЧИЛСЯ
+;;;
 ;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
-
-
-
-(setq read-file-name-completion-ignore-case     t)              ; minibuffer.el
-(setq enable-recursive-minibuffers              t)
-(minibuffer-depth-indicate-mode                 1)
 
 
 (after! markdown-mode
