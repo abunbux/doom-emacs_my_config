@@ -61,3 +61,6 @@
            :repo "https://codeberg.org/akib/emacs-corfu-terminal.git"))
 (package! backup-walker)
 (package! backup-each-save)
+(package! softresize
+ :recipe (:host github :repo "jdburgosr/softresize"))
+(package! free-keys)
