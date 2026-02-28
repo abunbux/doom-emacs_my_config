@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Суббота февраля 28 16:54:20 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Суббота февраля 28 23:25:10 MSK 2026>
 
 
 ;;; Commentary:
@@ -200,6 +200,14 @@
       gcmh-low-cons-threshold (* 2 1024 1024))          ; 2 MB базовый порог
 
 
+
+(setq browse-url-browser-function   'browse-url-generic
+      browse-url-generic-program    "/usr/bin/firefox-bin")
+
+
+
+
+
 ;; ;;; Unset keys
 ;; (global-unset-key (kbd "C-c"))       ; Эта комбинация изначально предназначалась для пользователя
 (global-unset-key (kbd "C-d"))          ; `delete-char'
@@ -255,6 +263,32 @@
         ;; Allows navigation through the mark ring by doing C-u C-SPC once, then C-SPC
         ;; C-SPC.  instead of C-u C-SPC C-u C-SPC C-u C-SPC ...
         set-mark-command-repeat-pop t)
+
+
+;;; font-lock.el
+(use-package! font-lock
+  :config
+  (message "Загрузка встроенного модуля \"font-lock\"")
+  ;; (jit-lock-debug-mode)
+  (setq-default font-lock-multiline           t                     ; font-core.el
+                font-lock-maximum-decoration  t                     ; font-core.el
+                ;; Указывает, какой вспомогательный механизм использовать
+                ;; для оптимизации отрисовки. JIT расшифровывается как Just-In-Time.
+                ;; Вместо того чтобы подсвечивать весь файл сразу (что «повесило» бы Emacs
+                ;; на огромных файлах), jit-lock-mode подсвечивает только ту часть текста,
+                ;; которую вы видите на экране прямо сейчас.
+                ;; Это стандарт де-факто в современном Emacs.
+                font-lock-support-mode        'jit-lock-mode        ; font-core.el
+                ;; jit-lock-chunk-size           1000               ; jit-lock.el
+                ;; jit-lock-defer-time           0.04               ; jit-lock.el
+                ;; jit-lock-stealth-time         16                 ; jit-lock.el
+                )
+  ;; (global-font-lock-mode)
+  )
+
+
+
+
 
 
 ;; НАСТРОЙКА БЭКАПОВ:
@@ -520,6 +554,12 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
+(global-set-key [remap isearch-forward] #'consult-line)
+
+
+
+
+
 (use-package! paren
   :config
   (message "Загрузка встроенного модуля \"paren\"")
@@ -538,19 +578,41 @@ Uses `current-date-time-format' for the formatting the date/time."
             (t (self-insert-command (or arg 1))))))
 
   (bind-key "%" 'my/match-paren)
-
-  ;; (let ((class '((class color) (min-colors 89)))
-  ;;       (cancel '(:slant italic :foreground "gray55")))
-
-  ;;   ;; Применяем настройки через custom-theme-set-faces
-  ;;   (custom-theme-set-faces
-  ;;    'user  ; 'user перекрывает текущую тему
-  ;;    `(show-paren-match ((,class ,cancel)))
-  ;;    `(show-paren-mismatch ((,class (:foreground "white" :background "red" :weight bold))))))
   )
 
 
 
+;; (use-package! symbol-overlay
+;;   :defer t
+;;   :commands (symbol-overlay-mode)
+;;   :config
+;;   (message "Загрузка \"symbol-overlay\"")
+;;   ;; (map! :leader
+;;   ;;       (:prefix ("s" . "search") ;; Группа SPC s (search)
+;;   ;;        ;; :desc "Toggle overlay"      "o" #'symbol-overlay-put
+;;   ;;        ;; :desc "Jump next"           "n" #'symbol-overlay-jump-next
+;;   ;;        ;; :desc "Jump prev"           "p" #'symbol-overlay-jump-prev
+;;   ;;        :desc "Remove all overlays" "O" #'symbol-overlay-remove-all
+;;   ;;        ;; :desc "Rename symbol"       "R" #'symbol-overlay-rename
+
+;;   ;;        :desc "symbol-overlay-put"  "i"        #'symbol-overlay-put
+;;   ;;        :desc "symbol-overlay-jump-next"       "n" #'symbol-overlay-jump-next
+;;   ;;        :desc "symbol-overlay-jump-prev"       "p" #'symbol-overlay-jump-prev
+;;   ;;        :desc "symbol-overlay-save-symbol"     "w" #'symbol-overlay-save-symbol
+;;   ;;        :desc "symbol-overlay-toggle-in-scope" "t" #'symbol-overlay-toggle-in-scope
+;;   ;;        :desc "symbol-overlay-echo-mark"       "e" #'symbol-overlay-echo-mark
+;;   ;;        :desc "symbol-overlay-jump-to-definition" "d" #'symbol-overlay-jump-to-definition
+;;   ;;        :desc "symbol-overlay-isearch-literally"  "s" #'symbol-overlay-isearch-literally
+;;   ;;        :desc "symbol-overlay-query-replace"      "q" #'symbol-overlay-query-replace
+;;   ;;        :desc "symbol-overlay-rename"   "R"    #'symbol-overlay-rename
+;;   ;;        ))
+
+;;   ;; Дублируем на привычные Alt-клавиши для скорости (без лидера)
+;;   (map! "M-i" #'symbol-overlay-put
+;;         "M-n" #'symbol-overlay-jump-next
+;;         "M-p" #'symbol-overlay-jump-prev)
+;;   :bind ("<f7>" . symbol-overlay-mode)
+;;   )
 
 
 
@@ -589,6 +651,10 @@ Uses `current-date-time-format' for the formatting the date/time."
               sh-basic-offset            4
               tab-always-indent          nil
               )
+
+
+(+global-word-wrap-mode +1)
+(setq +word-wrap-extra-indent 'double) ; варианты: 'single, 'double или число
 
 
 ;; Встроенная функция для перемещения линии `drag-stuff-down' - `M-<down>'
@@ -755,14 +821,14 @@ Uses `current-date-time-format' for the formatting the date/time."
             ;; (switch-to-buffer grid)
             ;; Выполнение команд (M-x) — максимально лаконично (одна строка)
             ;; (execute-extended-command unobtrusive)
-            (imenu buffer))
+            (imenu              buffer))
           )
 
     ;; 2. Настройка по КАТЕГОРИЯМ данных (vertico-multiform-categories)
     ;; Категории определяются автоматически (например, Marginalia)
     (setq vertico-multiform-categories
           '(;; Все действия с файлами — обратный список (новые внизу у промпта)
-            (file reverse)
+            ;; (file reverse)
             ;; Символы imenu — в буфере
             (imenu buffer)
             ;; Выбор библиотек — сетка с индексами для быстрого выбора
@@ -950,7 +1016,6 @@ Uses `current-date-time-format' for the formatting the date/time."
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
   ;; (bind-key "C-x |" 'my/toggle-window-split)
-
   )
 
 
@@ -1057,6 +1122,34 @@ Uses `current-date-time-format' for the formatting the date/time."
    (buffer-list)))
 
 (bind-key "C-d - a" 'my/kill-all-buffers)
+
+
+
+;;; Взято у `xuchunyang'
+;; Записанное в scratch не удаляется после выхода.
+(use-package! chunyang-scratch
+  :defer t
+  :preface
+  (defun chunyang-scratch-save ()
+    "Записывает scratch на дискю"
+    (ignore-errors
+      (with-current-buffer "*scratch*"
+        (write-region nil nil (concat doom-cache-dir "scratch")))))
+
+  (defun chunyang-scratch-restore ()
+    "Восстанавливает scratch."
+    (let ((f (concat doom-cache-dir "scratch")))
+      (when (file-exists-p f)
+        (with-current-buffer "*scratch*"
+          (insert-file-contents f)
+          (set-buffer-modified-p nil)))))
+
+  :init
+  (add-hook 'kill-emacs-hook #'chunyang-scratch-save)
+  (add-hook 'after-init-hook #'chunyang-scratch-restore)
+  ;; This is not a real package so don't load it
+  )
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

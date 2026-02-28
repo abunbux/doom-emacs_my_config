@@ -1,7 +1,7 @@
 ;;; my_ui/key/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:12:28 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Среда февраля 25 18:45:37 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Суббота февраля 28 22:49:31 MSK 2026>
 
 
 
@@ -45,36 +45,36 @@
 
     (setq which-key-highlighted-command-list
           '(
-            ;; ("\\`counsel-"    . ((t (:inherit default :foreground "seashell1"))))
-            ;; ("\\`swiper-"     . ((t (:inherit default :foreground "seashell1"))))
-            ;; ("\\`swiper"      . ((t (:inherit default :foreground "seashell1"))))
-            ;; ("\\`ivy-"        . ((t (:inherit default :foreground "seashell1"))))
-            ;; ("\\`helm-command-prefix" . ((t (:inherit default :weight bold :foreground "yellow"))))
-            ;; ("\\`helm-"       . ((t (:inherit default :foreground "red"))))
-            ;; ("-helm"          . ((t (:inherit default :foreground "red"))))
-            ("bookmark"       . ((t (:inherit default :foreground "hot pink"))))
-            ;; Highlight using the default `which-key-highlighted-command-face'
-            ("register"       . ((t (:inherit default :foreground "DeepSkyBlue"))))
-            ("rectangle-"     . ((t (:inherit default :foreground "LimeGreen"))))
-            ("-rectangle"     . ((t (:inherit default :foreground "LimeGreen"))))
+            ;; ;; ("\\`counsel-"    . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`swiper-"     . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`swiper"      . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`ivy-"        . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`helm-command-prefix" . ((t (:inherit default :weight bold :foreground "yellow"))))
+            ;; ;; ("\\`helm-"       . ((t (:inherit default :foreground "red"))))
+            ;; ;; ("-helm"          . ((t (:inherit default :foreground "red"))))
+            ;; ("bookmark"       . ((t (:inherit default :foreground "hot pink"))))
+            ;; ;; Highlight using the default `which-key-highlighted-command-face'
+            ;; ("register"       . ((t (:inherit default :foreground "DeepSkyBlue"))))
+            ;; ("rectangle-"     . ((t (:inherit default :foreground "LimeGreen"))))
+            ;; ("-rectangle"     . ((t (:inherit default :foreground "LimeGreen"))))
 
-            ("hlt-"           . ((t (:inherit default :foreground "green"))))
-            ("highlight-regexp"                 . ((t (:inherit default :foreground "IndianRed1"))))
-            ("highlight-phrase"                 . ((t (:inherit default :foreground "IndianRed1"))))
-            ("unhighlight-regexp"               . ((t (:inherit default :foreground "IndianRed1"))))
-            ("hi-lock-"                         . ((t (:inherit default :foreground "IndianRed1"))))
-            ("highlight-lines-matching-regexp"  . ((t (:inherit default :foreground "IndianRed1"))))
-            ("highlight-symbol-"                . ((t (:inherit default :foreground "#ab82ff"))))
+            ;; ("hlt-"           . ((t (:inherit default :foreground "green"))))
+            ;; ("highlight-regexp"                 . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-phrase"                 . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("unhighlight-regexp"               . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("hi-lock-"                         . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-lines-matching-regexp"  . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-symbol-"                . ((t (:inherit default :foreground "#ab82ff"))))
 
-            ("loccur"  . ((t (:inherit default :foreground "RosyBrown1"))))
+            ;; ("loccur"  . ((t (:inherit default :foreground "RosyBrown1"))))
 
-            ("dired-narrow"         . ((t (:inherit default :foreground "goldenrod1"))))
+            ;; ("dired-narrow"         . ((t (:inherit default :foreground "goldenrod1"))))
 
 
-            ("find-dired"           . ((t (:inherit default :foreground "SeaGreen1"))))
-            ("find-grep-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
-            ("find-name-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
-            ("dired-do-find"        . ((t (:inherit default :foreground "DeepSkyBlue1"))))
+            ;; ("find-dired"           . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("find-grep-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("find-name-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("dired-do-find"        . ((t (:inherit default :foreground "DeepSkyBlue1"))))
             ("kill"                 . ((t (:inherit default :foreground "red"))))
             ("delete"               . ((t (:inherit default :foreground "red"))))
             ("sudo"                 . ((t (:inherit default :foreground "red"))))
