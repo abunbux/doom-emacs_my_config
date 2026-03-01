@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Суббота февраля 28 23:25:10 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Воскресенье марта 1 16:55:26 MSK 2026>
 
 
 ;;; Commentary:
@@ -206,22 +206,35 @@
 
 
 
-
-
-;; ;;; Unset keys
+;;; Unset keys >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ;; (global-unset-key (kbd "C-c"))       ; Эта комбинация изначально предназначалась для пользователя
-(global-unset-key (kbd "C-d"))          ; `delete-char'
-(global-unset-key (kbd "C-x C-l"))      ; `downcase-region' - у меня для этого функция есть
-(global-unset-key (kbd "C-x C-u"))      ; `upcase-region' - у меня для этого функция есть
-(global-unset-key (kbd "C-z"))          ; `suspend-frame'
-(global-unset-key (kbd "M-h"))          ; `mark-paragraph'
+;; (global-unset-key (kbd "C-d"))          ; `delete-char'
+;; (global-unset-key (kbd "C-x C-l"))      ; `downcase-region' - у меня для этого функция есть
+;; (global-unset-key (kbd "C-x C-u"))      ; `upcase-region' - у меня для этого функция есть
+;; (global-unset-key (kbd "C-z"))          ; `suspend-frame'
+;; (global-unset-key (kbd "M-h"))          ; `mark-paragraph'
 ;; (global-unset-key (kbd "M-k"))       ; `kill-sentence'
 ;; (global-unset-key (kbd "M-m"))       ; `back-to-indentation'
 ;; (global-unset-key (kbd "M-s h"))     ; `hi-lock-...', `highlight-...', `unhighlight-'
 ;; (global-unset-key (kbd "M-s o"))     ; `occur'
 
+;; ;; Выключить кнопку Insert (включение overwrite-mode):
+;; (define-key global-map [(insert)] nil)
+
+
+(map! "C-d"     nil)            ; `delete-char'
+(map! "C-x C-l" nil)            ; `downcase-region' - у меня для этого функция есть
+(map! "C-x C-u" nil)            ; `upcase-region' - у меня для этого функция есть
+(map! "C-z"     nil)            ; `suspend-frame'
+(map! "M-h"     nil)            ; `mark-paragraph'
+
 ;; Выключить кнопку Insert (включение overwrite-mode):
-(define-key global-map [(insert)] nil)
+(map! [(insert)] nil)
+;; Снимаем стандартный isearch
+(map! "C-s" nil)
+;; блок Unset keys закончился
+
+
 
 
 ;; Общие настройки интерфейса и поведения:
@@ -696,37 +709,33 @@ Uses `current-date-time-format' for the formatting the date/time."
     (comment-or-uncomment-region
      (line-beginning-position)
      (line-end-position lines))))
-(bind-key "C-x /" 'my/comment-or-uncomment-this)
+;; (bind-key "C-x /" 'my/comment-or-uncomment-this)
+(map! "C-x /" #'my/comment-or-uncomment-this)
 
 
 
-;;; delsel.el
-(bind-key "C-g" 'minibuffer-keyboard-quit mode-specific-map)
 
-;;; Работа с выделением.
-;;; При существующем выделении (region) нажатие:
-;;;     -d	Удалить region;
-;;;     -w	Скопировать region;
-;;;     -c	Дублировать, то есть скопировать и сразу вставить.
+;;; Работа с выделением. >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;; При существующем выделении (region) нажатие:
+;;     -d	Удалить region;
+;;     -w	Скопировать region;
+;;     -c	Дублировать, то есть скопировать и сразу вставить.
 
-(bind-key
- (kbd "d")
+(map! "d"
  (lambda (arg)
    (interactive "p")
    (if (region-active-p)
        (delete-active-region)
      (self-insert-command arg))))
 
-(bind-key
- (kbd "w")
+(map! "w"
  (lambda (arg)
    (interactive "p")
    (if (region-active-p)
        (call-interactively 'kill-ring-save)
      (self-insert-command arg))))
 
-(bind-key
- (kbd "c")
+(map! "c"
  (lambda (arg)
    (interactive "p")
    (if (region-active-p)
@@ -736,6 +745,7 @@ Uses `current-date-time-format' for the formatting the date/time."
          (goto-char (region-end))
          (insert "\n" str))
      (self-insert-command arg))))
+
 
 
 (with-eval-after-load 'corfu
@@ -751,31 +761,27 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;       МИНИБУФЕР, ПОДСКАЗКИ, СОРТИРОВКА И ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ        ;;;
-;;;
-;;; vertico - это современный и минималистичный интерфейс для автодополнения в минибуфере.
-;;;             В отличие от Ivy или Helm, он не переписывает стандартные функции Emacs,
-;;;             а использует встроенный механизм completing-read, что делает его очень
-;;;             быстрым и стабильным.
-;;; Обычно Vertico используют не один, а в связке с другими модулями, которые Doom включает
-;;;             автоматически при активации vertico:
-;;; orderless   - позволяет искать компоненты запроса в любом порядке через пробел.
-;;; consult     - предоставляет полезные команды поиска (например, consult-line вместо Swiper или consult-buffer).
-;;; marginalia  - добавляет полезные пояснения в список кандидатов (права доступа к файлам, описания функций).
-;;; позволяет      - embark вызывать контекстные действия для выбранного кандидата (например, удалить файл прямо из списка поиска).
-;;;
-;;;
-;;; corfu - это современный и минималистичный интерфейс для автодополнения в тексте (completion-at-point) для Emacs.
-;;;             В Doom Emacs он является альтернативой стандартному модулю company.
-;;;
-;;;     в терминале M-x `completion-at-point' или `C-M-i'                   ;;;
-;;;     Не забываем:                                                        ;;;
-;;;     M-x `nerd-icons-install-fonts'                                      ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; МИНИБУФЕР, ПОИСК, ПОДСКАЗКИ, СОРТИРОВКА И ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ >>>>>>>>>
+;;
+;; vertico - это современный и минималистичный интерфейс для автодополнения в минибуфере.
+;;             В отличие от Ivy или Helm, он не переписывает стандартные функции Emacs,
+;;             а использует встроенный механизм completing-read, что делает его очень
+;;             быстрым и стабильным.
+;; Обычно Vertico используют не один, а в связке с другими модулями, которые Doom включает
+;;             автоматически при активации vertico:
+;; orderless   - позволяет искать компоненты запроса в любом порядке через пробел.
+;; consult     - предоставляет полезные команды поиска (например, consult-line вместо Swiper или consult-buffer).
+;; marginalia  - добавляет полезные пояснения в список кандидатов (права доступа к файлам, описания функций).
+;; позволяет      - embark вызывать контекстные действия для выбранного кандидата (например, удалить файл прямо из списка поиска).
+;;
+;;
+;; corfu - это современный и минималистичный интерфейс для автодополнения в тексте (completion-at-point) для Emacs.
+;;             В Doom Emacs он является альтернативой стандартному модулю company.
+;;
+;;     в терминале M-x `completion-at-point' или `C-M-i'
+;;     Не забываем:
+;;     M-x `nerd-icons-install-fonts'
+
 
 
 ;; МИНИБУФЕР
@@ -789,12 +795,12 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;; по документации прямо в эхо-область (нижнюю строку) в реальном времени:
 (global-eldoc-mode      -1)
 
+(map! :map mode-specific-map "C-g" #'minibuffer-keyboard-quit)  ; abort recursive edit
 
-
-;; ;; Включите режим отображения vertico в буфере
+;;; Включите режим отображения vertico в буфере
 ;; (vertico-buffer-mode 1)
 
-;; ;; Теперь можно настроить его через display-buffer-alist
+;; Теперь можно настроить его через display-buffer-alist
 ;; (add-to-list 'display-buffer-alist
 ;;              '("\\*vertico\\*"
 ;;                (display-buffer-in-side-window)
@@ -802,6 +808,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;                (window-width . 0.3)))
 
 
+;;; vertico-multiform
 (after! vertico
   (use-package! vertico-multiform
     ;; :after vertico
@@ -851,8 +858,22 @@ Uses `current-date-time-format' for the formatting the date/time."
   )
 
 
+;;; vertico-prescient
+(use-package! vertico-prescient
+  :after vertico
+  :config
+  ;; Оставляем только сортировку (фреквенцию), отключаем фильтрацию prescient:
+  (setq vertico-prescient-enable-filtering nil)
+  ;; Включаем интеграцию с Vertico
+  (vertico-prescient-mode 1)
+  ;; Включаем сохранение истории выбора между сессиями:
+  (prescient-persist-mode 1)
+  (message "Загрузка \"vertico-prescient\"")
+  )
 
 
+
+;;; orderless
 (with-eval-after-load 'orderless
   (message "Загрузка \"orderless\"")
 
@@ -876,18 +897,8 @@ Uses `current-date-time-format' for the formatting the date/time."
         ))
 
 
-(use-package! vertico-prescient
-  :after vertico
-  :config
-  ;; Оставляем только сортировку (фреквенцию), отключаем фильтрацию prescient:
-  (setq vertico-prescient-enable-filtering nil)
-  ;; Включаем интеграцию с Vertico
-  (vertico-prescient-mode 1)
-  ;; Включаем сохранение истории выбора между сессиями:
-  (prescient-persist-mode 1)
-  (message "Загрузка \"vertico-prescient\"")
-  )
 
+;;; corfu-terminal
 ;; С помощью пакета corfu-terminal corfu будет нормально работать в консольном режиме:
 (use-package! corfu-terminal
   :after corfu
@@ -897,14 +908,30 @@ Uses `current-date-time-format' for the formatting the date/time."
     (corfu-terminal-mode +1)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                             БЛОК                                        ;;;
-;;; МИНИБУФЕРА, ПОДСКАЗОК, СОРТИРОВКИ И ОТОБРАЖЕНИЯ РЕЗУЛЬТАТОВ             ;;;
-;;;                          ЗАКОНЧИЛСЯ                                     ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package! consult
+  :config
+  (message "Загрузка \"consult\"")
+  (map! :prefix "C-s"
+        :desc "Search line"           "s" #'consult-line
+        :desc "Search line (multi)"   "S" #'consult-line-multi
+        :desc "Ripgrep search"        "r" #'consult-ripgrep
+        :desc "Git grep search"       "g" #'consult-git-grep
+        :desc "Focus lines"           "f" #'consult-focus-lines
+        :desc "Outline / Headings"    "o" #'consult-outline
+        :desc "Imenu (Symbols)"       "i" #'consult-imenu
+        :desc "Jump to mark"          "m" #'consult-mark
+        :desc "Global mark"           "M" #'consult-global-mark)
+  )
+
+
+
+
+
+
+
+
+;;; БЛОК МИНИБУФЕРА, ПОИСКА, ПОДСКАЗОК, СОРТИРОВКИ И ОТОБРАЖЕНИЯ РЕЗУЛЬТАТОВ  ЗАКОНЧИЛСЯ
 
 
 
@@ -1147,6 +1174,8 @@ Uses `current-date-time-format' for the formatting the date/time."
   :init
   (add-hook 'kill-emacs-hook #'chunyang-scratch-save)
   (add-hook 'after-init-hook #'chunyang-scratch-restore)
+  :config
+  (message "Загрузка псевдо-пакета \"chunyang-scratch\"")
   ;; This is not a real package so don't load it
   )
 
