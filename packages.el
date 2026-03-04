@@ -65,3 +65,4 @@
  :recipe (:host github :repo "jdburgosr/softresize"))
 (package! free-keys)
 (package! symbol-overlay)
+(package! current-window-only)

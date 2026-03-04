@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Воскресенье марта 1 16:55:26 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Среда марта 4 15:56:13 MSK 2026>
 
 
 ;;; Commentary:
@@ -10,7 +10,6 @@
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
-;;; Code:
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
@@ -36,83 +35,6 @@
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
-
-
-;;; Темы, внешний вид.
-;; Указываем Doom, где искать кастомные темы:
-(add-to-list 'custom-theme-load-path "~/.config/doom/themes/")
-
-;; Стартуем emacs на весь экран и устанавливаем цветовую тему в зависимости от того,
-;; где работаем - гуй или терминал
-(if (display-graphic-p)
-    (progn
-      (setq-default cursor-type     '(bar . 3))
-      (defun my-cursor-change-visual ()
-        "Меняет цвет курсора в зависимости от состояния буфера."
-        (cond
-         (buffer-read-only  (set-cursor-color "#ff6c6b"))       ; Красный, если только чтение
-         (overwrite-mode    (set-cursor-color "#da8548"))       ; Оранжевый в режиме замены
-         (t                 (set-cursor-color "#ced23a"))))     ; Стандартный, определённый в теме
-
-      ;; Запускаем проверку при каждом переключении
-      (add-hook 'post-command-hook 'my-cursor-change-visual)
-
-      ;; Масштабируемые шрифты в графическом интерфейсе
-      ;; C-x C-+ or C-x C--
-      (setq scalable-fonts-allowed t)                                       ; C-code (emacs)
-
-      (setq-default initial-frame-alist   (quote    ((fullscreen . maximized))))
-
-      (load-theme 'abunbux t)
-
-      (message "Загрузка темы оформления \"abunbux\"")
-      )
-  (progn
-    (setq doom-theme 'doom-solarized-dark-high-contrast)
-    (message "Загрузка темы \"doom-solarized-dark-high-contrast\"")))
-
-
-(setq doom-font (font-spec :family "JetBrainsMono" :size 22 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "DejaVu Sans" :size 22)
-      doom-symbol-font (font-spec :family "FiraCode Nerd Font Mono")
-      doom-big-font (font-spec :family "JetBrainsMono" :size 24))
-
-;; Назначаем `Symbola' фолбэк-шрифтом (fallback).
-;; Это значит: если основной шрифт не знает какой-то символ (стрелку, эмодзи, редкий глиф),
-;; Emacs автоматически возьмет его из Symbola:
-(defun setup-unicode-fallback-h ()
-  (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'append))
-(add-hook 'doom-init-ui-hook #'setup-unicode-fallback-h)
-
-;; Что делает этот `🡅' код:
-;;      'unicode        - указывает Emacs использовать этот шрифт для всех символов,
-;;                      которые не входят в базовую латиницу/кириллицу.
-;;      'append         - важнейший параметр. Он ставит Symbola в конец очереди.
-;;                      Сначала Emacs ищет символ в вашем основном шрифте (например, JetBrains Mono),
-;;                      и только если его там нет - лезет в Symbola.
-;;      doom-init-ui-hook - гарантирует, что настройка применится после того, как Doom загрузит свои стандартные шрифты.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-;; (setq doom-theme 'doom-one)
-;; (setq doom-theme 'doom-tomorrow-night)
-;; (setq doom-theme 'leuven-theme)
-;; (load-theme 'abunbux t)
-;; (require 'abunbux-theme)
-
-
-
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
-
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
 
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
@@ -147,9 +69,12 @@
 ;; they are implemented.
 
 
+;;; Code:
+
+
 ;;; Сборщик мусора, отладка.
 ;; Показывает в логах каждый загружаемый .el/.elc файл
-(setq force-load-messages t)
+;; (setq force-load-messages t)
 
 ;; Добавляем этот код, чтобы видеть, сколько раз срабатывал GC с момента запуска:
 (with-eval-after-load 'doom-modeline
@@ -200,44 +125,96 @@
       gcmh-low-cons-threshold (* 2 1024 1024))          ; 2 MB базовый порог
 
 
+;;; Темы, внешний вид.
+;; Указываем Doom, где искать кастомные темы:
+(add-to-list 'custom-theme-load-path "~/.config/doom/themes/")
 
-(setq browse-url-browser-function   'browse-url-generic
-      browse-url-generic-program    "/usr/bin/firefox-bin")
+;; Стартуем emacs на весь экран и устанавливаем цветовую тему в зависимости от того,
+;; где работаем - гуй или терминал
+(if (display-graphic-p)
+    (progn
+      (setq-default cursor-type     '(bar . 3))
+      (defun my-cursor-change-visual ()
+        "Меняет цвет курсора в зависимости от состояния буфера."
+        (cond
+         (buffer-read-only  (set-cursor-color "#ff6c6b"))       ; Красный, если только чтение
+         (overwrite-mode    (set-cursor-color "#da8548"))       ; Оранжевый в режиме замены
+         (t                 (set-cursor-color "#ced23a"))))     ; Стандартный, определённый в теме
+
+      ;; Запускаем проверку при каждом переключении
+      (add-hook 'post-command-hook 'my-cursor-change-visual)
+
+      ;; Масштабируемые шрифты в графическом интерфейсе
+      ;; C-x C-+ or C-x C--
+      (setq scalable-fonts-allowed t)
+
+      (setq-default initial-frame-alist   (quote    ((fullscreen . maximized))))
+
+      ;; There are two ways to load a theme. Both assume the theme is installed and
+      ;; available. You can either set `doom-theme' or manually load a theme with the
+      ;; `load-theme' function. This is the default:
+      ;; (setq doom-theme 'doom-one)
+      ;; (setq doom-theme 'doom-tomorrow-night)
+      ;; (setq doom-theme 'leuven-theme)
+      ;; (load-theme 'abunbux t)
+      ;; (require 'abunbux-theme)
+
+      (load-theme 'abunbux t)
+
+      (message "Загрузка темы оформления \"abunbux\"")
+      )
+  (progn
+    (setq doom-theme 'doom-solarized-dark-high-contrast)
+    (message "Загрузка темы \"doom-solarized-dark-high-contrast\""))
+  )
+
+
+;;; Назначаем шрифты:
+(setq doom-font (font-spec :family "JetBrainsMono" :size 22 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "DejaVu Sans" :size 22)
+      doom-symbol-font (font-spec :family "FiraCode Nerd Font Mono")
+      doom-big-font (font-spec :family "JetBrainsMono" :size 24))
+
+;; Назначаем `Symbola' фолбэк-шрифтом (fallback).
+;; Это значит: если основной шрифт не знает какой-то символ (стрелку, эмодзи, редкий глиф),
+;; Emacs автоматически возьмет его из Symbola:
+(defun setup-unicode-fallback-h ()
+  (set-fontset-font t 'unicode (font-spec :family "Symbola") nil 'append))
+(add-hook 'doom-init-ui-hook #'setup-unicode-fallback-h)
+
+;; Что делает этот `🡅' код:
+;;      'unicode        - указывает Emacs использовать этот шрифт для всех символов,
+;;                      которые не входят в базовую латиницу/кириллицу.
+;;      'append         - важнейший параметр. Он ставит Symbola в конец очереди.
+;;                      Сначала Emacs ищет символ в вашем основном шрифте (например, JetBrains Mono),
+;;                      и только если его там нет - лезет в Symbola.
+;;      doom-init-ui-hook - гарантирует, что настройка применится после того, как Doom загрузит свои стандартные шрифты.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 
-;;; Unset keys >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;;; Unset keys. Отменяем некоторые сочетания клавиш:
 ;; (global-unset-key (kbd "C-c"))       ; Эта комбинация изначально предназначалась для пользователя
-;; (global-unset-key (kbd "C-d"))          ; `delete-char'
-;; (global-unset-key (kbd "C-x C-l"))      ; `downcase-region' - у меня для этого функция есть
-;; (global-unset-key (kbd "C-x C-u"))      ; `upcase-region' - у меня для этого функция есть
-;; (global-unset-key (kbd "C-z"))          ; `suspend-frame'
-;; (global-unset-key (kbd "M-h"))          ; `mark-paragraph'
+(global-unset-key (kbd "C-d"))          ; `delete-char'
+(global-unset-key (kbd "C-s"))          ; `isearch'
+(global-unset-key (kbd "C-x C-l"))      ; `downcase-region' - у меня для этого функция есть
+(global-unset-key (kbd "C-x C-u"))      ; `upcase-region' - у меня для этого функция есть
+(global-unset-key (kbd "C-z"))          ; `suspend-frame'
+(global-unset-key (kbd "M-h"))          ; `mark-paragraph'
 ;; (global-unset-key (kbd "M-k"))       ; `kill-sentence'
 ;; (global-unset-key (kbd "M-m"))       ; `back-to-indentation'
 ;; (global-unset-key (kbd "M-s h"))     ; `hi-lock-...', `highlight-...', `unhighlight-'
 ;; (global-unset-key (kbd "M-s o"))     ; `occur'
 
 ;; ;; Выключить кнопку Insert (включение overwrite-mode):
-;; (define-key global-map [(insert)] nil)
+(define-key global-map [(insert)] nil)
 
-
-(map! "C-d"     nil)            ; `delete-char'
-(map! "C-x C-l" nil)            ; `downcase-region' - у меня для этого функция есть
-(map! "C-x C-u" nil)            ; `upcase-region' - у меня для этого функция есть
-(map! "C-z"     nil)            ; `suspend-frame'
-(map! "M-h"     nil)            ; `mark-paragraph'
-
-;; Выключить кнопку Insert (включение overwrite-mode):
-(map! [(insert)] nil)
-;; Снимаем стандартный isearch
-(map! "C-s" nil)
 ;; блок Unset keys закончился
 
 
 
 
-;; Общие настройки интерфейса и поведения:
+;;; Общие настройки интерфейса и поведения:
 (setq-default
  window-combination-resize       t       ; Новые окна делят место равномерно
  x-stretch-cursor                t       ; Курсор растягивается на ширину глифа (напр. Tab)
@@ -255,7 +232,9 @@
  ;; Emacs спросит: Active processes exist; kill them and exit anyway?.
  confirm-kill-emacs              nil
  indent-tabs-mode                nil     ; Использовать пробелы вместо табуляции
- tab-width                       4)
+ tab-width                       4
+ fill-column                     120
+ )
 
 
 ;; Mouse & Smooth Scroll
@@ -263,7 +242,9 @@
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
       mouse-wheel-progressive-speed nil)
 
-
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
 
 ;; Настройки поиска и регистров:
 (setq   case-fold-search t
@@ -278,33 +259,55 @@
         set-mark-command-repeat-pop t)
 
 
+;; Исправление/Оптимизация специфичных вещей.
+;; Функция Emacs Lisp display-startup-echo-area-message отвечает за отображение начального
+;; стартового сообщения в эхо-области (области минибуфера) при запуске Emacs.
+;; Сообщение по умолчанию обычно следующее: «Для получения информации
+;; о GNU Emacs и системе GNU введите C-h C-a»:
+(fset 'display-startup-echo-area-message #'ignore)
+
+;; auto-compression-mode — это режим, который позволяет Emacs «прозрачно» работать
+;; со сжатыми файлами (например, .gz, .bz2, .xz, .zip).
+;; 1. Авто-распаковка: Когда вы открываете файл logs.txt.gz, Emacs сам распаковывает
+;; его в память и показывает содержимое.
+;; 2. Авто-сжатие: При сохранении изменений (C-x C-s) Emacs автоматически упаковывает
+;; файл обратно на диск, используя соответствующий архиватор:
+(auto-compression-mode      t)
+
+
 ;;; font-lock.el
 (use-package! font-lock
   :config
   (message "Загрузка встроенного модуля \"font-lock\"")
   ;; (jit-lock-debug-mode)
-  (setq-default font-lock-multiline           t                     ; font-core.el
-                font-lock-maximum-decoration  t                     ; font-core.el
+  (setq-default font-lock-multiline           t
+                font-lock-maximum-decoration  t
                 ;; Указывает, какой вспомогательный механизм использовать
                 ;; для оптимизации отрисовки. JIT расшифровывается как Just-In-Time.
                 ;; Вместо того чтобы подсвечивать весь файл сразу (что «повесило» бы Emacs
                 ;; на огромных файлах), jit-lock-mode подсвечивает только ту часть текста,
                 ;; которую вы видите на экране прямо сейчас.
                 ;; Это стандарт де-факто в современном Emacs.
-                font-lock-support-mode        'jit-lock-mode        ; font-core.el
-                ;; jit-lock-chunk-size           1000               ; jit-lock.el
-                ;; jit-lock-defer-time           0.04               ; jit-lock.el
-                ;; jit-lock-stealth-time         16                 ; jit-lock.el
+                font-lock-support-mode        'jit-lock-mode
+                ;; jit-lock-chunk-size           1000
+                ;; jit-lock-defer-time           0.04
+                ;; jit-lock-stealth-time         16
                 )
   ;; (global-font-lock-mode)
   )
 
 
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/org/")
+
+(setq browse-url-browser-function   'browse-url-generic
+      browse-url-generic-program    "/usr/bin/firefox-bin")
 
 
 
 
-;; НАСТРОЙКА БЭКАПОВ:
+;;; НАСТРОЙКА БЭКАПОВ:
 (setq   make-backup-files               t
         ;; Эта настройка заставляет Emacs создавать резервные копии
         ;; (те самые файлы с тильдой ~ в конце) даже для тех файлов,
@@ -379,7 +382,7 @@
   )
 
 
-;; SAVEHIST (улучшенное сохранение истории)
+;;; SAVEHIST, SAVE-PLACE, DESKTOP-SAVE
 ;; В Doom модуль (:ui workspaces) или (:completion ...) уже могут включать savehist,
 ;; но ручная донастройка переменных полезна:
 (after! savehist
@@ -416,28 +419,7 @@
 
 
 
-;; Исправление/Оптимизация специфичных вещей.
-;; Функция Emacs Lisp display-startup-echo-area-message отвечает за отображение начального
-;; стартового сообщения в эхо-области (области минибуфера) при запуске Emacs.
-;; Сообщение по умолчанию обычно следующее: «Для получения информации
-;; о GNU Emacs и системе GNU введите C-h C-a»:
-(fset 'display-startup-echo-area-message #'ignore)
-
-;; auto-compression-mode — это режим, который позволяет Emacs «прозрачно» работать
-;; со сжатыми файлами (например, .gz, .bz2, .xz, .zip).
-;; 1. Авто-распаковка: Когда вы открываете файл logs.txt.gz, Emacs сам распаковывает
-;; его в память и показывает содержимое.
-;; 2. Авто-сжатие: При сохранении изменений (C-x C-s) Emacs автоматически упаковывает
-;; файл обратно на диск, используя соответствующий архиватор:
-(auto-compression-mode      t)
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                          ЛОКАЛЬ, ВРЕМЯ                                  ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; ЛОКАЛЬ, ВРЕМЯ
 
 ;; Чтобы не возникало ниже написанного:
 ;; "Warning (yasnippet): ‘lexical-binding-Time-stamp’ modified buffer in a backquote expression.
@@ -473,9 +455,12 @@ Uses `current-date-time-format' for the formatting the date/time."
   (insert (format-time-string current-time-format (current-time)))
   (insert "\n"))
 
-(bind-key "C-c t d" 'my/insert-current-date-time)
-(bind-key "C-c t t" 'my/insert-current-time)
-(bind-key "C-x RET R"   'recode-region)
+;; (bind-key "C-c t d" 'my/insert-current-date-time)
+;; (bind-key "C-c t t" 'my/insert-current-time)
+;; (bind-key "C-x RET R"   'recode-region)
+(map! "C-c t d"         #'my/insert-current-date-time)
+(map! "C-c t t"         #'my/insert-current-time)
+(map! "C-x RET R"       #'recode-region)
 
 
 
@@ -496,6 +481,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   )
 
 
+;;; char-fold:
 (after! char-fold
   (use-package! char-fold
     :config
@@ -505,6 +491,8 @@ Uses `current-date-time-format' for the formatting the date/time."
     ;; Включить char-fold для обычного поиска (isearch)
     )
 
+
+;;; reverse-im:
   (use-package! reverse-im
     :custom
     (reverse-im-char-fold t)
@@ -519,7 +507,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   )
 
 
-;; ;; Хоткеи при русской раскладке
+;; Хоткеи при русской раскладке
 ;; ;; https://www.linux.org.ru/forum/general/9959057?cid=9959379
 ;; (defun reverse-input-method (input-method)
 ;;   "Build the reverse mapping of single letters from INPUT-METHOD."
@@ -548,29 +536,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                    БЛОК  ЛОКАЛЬ, ВРЕМЯ ЗАКОНЧИЛСЯ                       ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                   ПЕРЕМЕЩЕНИЕ, ПОИСК                                    ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-(global-set-key [remap isearch-forward] #'consult-line)
-
-
-
+;;; ПЕРЕМЕЩЕНИЕ, ПОИСК
 
 
 (use-package! paren
@@ -629,21 +595,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;           БЛОК ПЕРЕМЕЩЕНИЯ И ПОИСКА ЗАКОНЧИЛСЯ                          ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                          РЕДАКТИРОВАНИЕ                                 ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; РЕДАКТИРОВАНИЕ.
 
 ;; Если значение переменной sentence-end равно nil (по умолчанию),
 ;; Emacs вычисляет конец предложения динамически на основе sentence-end-double-space.
@@ -673,7 +625,8 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;; Встроенная функция для перемещения линии `drag-stuff-down' - `M-<down>'
 ;; Встроенная функция для дублирования линии `duplicate-line',
 ;; Встроенная функция для дублирования линии или выделения `duplicate-dwim':
-(bind-key "C-x <down>" 'duplicate-dwim)
+;; (bind-key "C-x <down>" 'duplicate-dwim)
+(map! "C-x <down>" #'duplicate-dwim)
 
 
 ;; indent buffer-region
@@ -694,13 +647,17 @@ Uses `current-date-time-format' for the formatting the date/time."
       (progn
         (my/indent-buffer)
         (message "Indented buffer.")))))
-(bind-key "C-M-\\" 'my/indent-region-or-buffer)
+;; (bind-key "C-M-\\" 'my/indent-region-or-buffer)
+(map! "C-M-\\" #'my/indent-region-or-buffer)
 
 
-;; Если есть выделение - комментирует выделение, если выделения нет - комментирует строку.
+;;; comment-or-uncomment.
+;; При наличии выделенного региона комментирует его, в противном
+;; случае комментирует строку.
 ;; https://github.com/rigidus/.emacs.d/blob/master/init.el
 ;; my/comment-or-uncomment-this ("C-x /")
 (defun my/comment-or-uncomment-this (&optional lines)
+  "Комментирует либо регион, либо строку."
   (interactive "P")
   (if mark-active
       (if (< (mark) (point))
@@ -715,36 +672,36 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;; Работа с выделением. >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;;; Работа с выделением - удалить, скопировать, дублировать.
 ;; При существующем выделении (region) нажатие:
 ;;     -d	Удалить region;
 ;;     -w	Скопировать region;
 ;;     -c	Дублировать, то есть скопировать и сразу вставить.
 
 (map! "d"
- (lambda (arg)
-   (interactive "p")
-   (if (region-active-p)
-       (delete-active-region)
-     (self-insert-command arg))))
+      (lambda (arg)
+        (interactive "p")
+        (if (region-active-p)
+            (delete-active-region)
+          (self-insert-command arg))))
 
 (map! "w"
- (lambda (arg)
-   (interactive "p")
-   (if (region-active-p)
-       (call-interactively 'kill-ring-save)
-     (self-insert-command arg))))
+      (lambda (arg)
+        (interactive "p")
+        (if (region-active-p)
+            (call-interactively 'kill-ring-save)
+          (self-insert-command arg))))
 
 (map! "c"
- (lambda (arg)
-   (interactive "p")
-   (if (region-active-p)
-       (let ((str (buffer-substring-no-properties
-                   (region-beginning)
-                   (region-end))))
-         (goto-char (region-end))
-         (insert "\n" str))
-     (self-insert-command arg))))
+      (lambda (arg)
+        (interactive "p")
+        (if (region-active-p)
+            (let ((str (buffer-substring-no-properties
+                        (region-beginning)
+                        (region-end))))
+              (goto-char (region-end))
+              (insert "\n" str))
+          (self-insert-command arg))))
 
 
 
@@ -752,17 +709,9 @@ Uses `current-date-time-format' for the formatting the date/time."
   (setq tab-always-indent nil))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;                РАЗДЕЛ РЕДАКТИРОВАНИЯ ЗДЕСЬ ЗАКОНЧИЛСЯ                   ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-
-;;; МИНИБУФЕР, ПОИСК, ПОДСКАЗКИ, СОРТИРОВКА И ОТОБРАЖЕНИЕ РЕЗУЛЬТАТОВ >>>>>>>>>
-;;
+;;; МИНИБУФЕР, ПОИСК, АВТОДОПОЛНЕНИЕ.
 ;; vertico - это современный и минималистичный интерфейс для автодополнения в минибуфере.
 ;;             В отличие от Ivy или Helm, он не переписывает стандартные функции Emacs,
 ;;             а использует встроенный механизм completing-read, что делает его очень
@@ -797,46 +746,51 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 (map! :map mode-specific-map "C-g" #'minibuffer-keyboard-quit)  ; abort recursive edit
 
-;;; Включите режим отображения vertico в буфере
-;; (vertico-buffer-mode 1)
 
-;; Теперь можно настроить его через display-buffer-alist
-;; (add-to-list 'display-buffer-alist
-;;              '("\\*vertico\\*"
-;;                (display-buffer-in-side-window)
-;;                (side . right)
-;;                (window-width . 0.3)))
-
-
-;;; vertico-multiform
+;;; vertico-multiform - позволяет вам настраивать Vertico
+;;; для каждой команды или для каждой категории завершения.
 (after! vertico
   (use-package! vertico-multiform
-    ;; :after vertico
     :config
     (message "Загрузка \"vertico-multiform\"")
-    ;; (vertico-multiform-mode 1)
+
+    ;; Этот блок перенаправляет стандартное дополнение в интерфейс Vertico через Consult.
+    ;; Стандартное дополнение это completion-at-point (C-M-i).
+    ;; И срабатывать будет только при отсутсвии corfu, или чем там ещё пользуются для дополнения.
+    (setq completion-in-region-function
+          (lambda (&rest args)
+            (apply (if vertico-mode
+                       #'consult-completion-in-region
+                     #'completion--in-region)
+                   args)))
+
+    ;; Чтобы вертикальный список не «прыгал» и не перекрывал лишнего, настроим
+    ;; его через vertico-multiform-mode.
+    ;; Это позволит задать конкретные параметры именно для этой функции:
+    (setq vertico-multiform-commands
+          '(;; Для дополнения в коде используем вертикальный список,
+            ;; но ограничиваем его высоту (например, 6 строк)
+            (consult-completion-in-region (vertico-count . 6))))
 
     ;; 1. Настройка по КОМАНДАМ (vertico-multiform-commands)
     (setq vertico-multiform-commands
           '(
-            ;; Поиск consult-line и consult-line-multi — в отдельном буфере
-            (consult-line         buffer)
-            (consult-line-multi   buffer)
-            ;; Поиск grep — в буфере для удобного просмотра длинных строк
-            (consult-grep         buffer)
-            ;; Переключение буферов — в виде сетки (удобно, если их много)
-            ;; (switch-to-buffer grid)
-            ;; Выполнение команд (M-x) — максимально лаконично (одна строка)
-            ;; (execute-extended-command unobtrusive)
-            (imenu              buffer))
+            (consult-line       buffer)
+            (consult-line-multi buffer)
+            (consult-grep       buffer)
+            (consult-ripgrep    buffer)
+            (imenu              buffer)
+            (consult-outline    buffer)
+            (consult-git-grep   buffer)
+            (consult-mark       buffer)
+            (consult-global-mark buffer)
+            )
           )
 
     ;; 2. Настройка по КАТЕГОРИЯМ данных (vertico-multiform-categories)
     ;; Категории определяются автоматически (например, Marginalia)
     (setq vertico-multiform-categories
-          '(;; Все действия с файлами — обратный список (новые внизу у промпта)
-            ;; (file reverse)
-            ;; Символы imenu — в буфере
+          '(
             (imenu buffer)
             ;; Выбор библиотек — сетка с индексами для быстрого выбора
             (library grid indexed)))
@@ -849,7 +803,10 @@ Uses `current-date-time-format' for the formatting the date/time."
             (define-key map (kbd "M-B") #'vertico-multiform-buffer)
             (define-key map (kbd "M-F") #'vertico-multiform-flat)
             (define-key map (kbd "M-R") #'vertico-multiform-reverse)
-            map)))
+            (define-key map (kbd "M-U") #'vertico-multiform-unobtrusive)
+            (define-key map (kbd "M-V") #'vertico-multiform-vertical)
+            map))
+    )
 
   ;; *   **buffer**: Открывает полноценное окно Emacs. Полезно для `consult-line`, чтобы видеть контекст кода.
   ;; *   **grid**: Располагает элементы в несколько колонок. Идеально для `switch-to-buffer`.
@@ -858,7 +815,8 @@ Uses `current-date-time-format' for the formatting the date/time."
   )
 
 
-;;; vertico-prescient
+
+;;; vertico-prescient:
 (use-package! vertico-prescient
   :after vertico
   :config
@@ -873,7 +831,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;; orderless
+;;; orderless:
 (with-eval-after-load 'orderless
   (message "Загрузка \"orderless\"")
 
@@ -898,7 +856,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;; corfu-terminal
+;;; corfu-terminal:
 ;; С помощью пакета corfu-terminal corfu будет нормально работать в консольном режиме:
 (use-package! corfu-terminal
   :after corfu
@@ -908,7 +866,23 @@ Uses `current-date-time-format' for the formatting the date/time."
     (corfu-terminal-mode +1)))
 
 
+;;; Нужно разобраться.
+;; (after! embark
+;;   (global-set-key (kbd "C-:") 'embark-dwim)
+;;   (global-set-key (kbd "C-*") 'embark-select)
 
+;;   (define-key minibuffer-local-map (kbd "M-.") #'my/embark-preview)
+;;   (defun my/embark-preview ()
+;;     "Previews candidate in vertico buffer, unless it's a consult command"
+;;     (interactive)
+;;     (unless (bound-and-true-p consult--preview-function)
+;;       (save-selected-window
+;;         (let ((embark-quit-after-action nil))
+;;           (embark-dwim))))))
+
+
+
+;;; consult:
 (use-package! consult
   :config
   (message "Загрузка \"consult\"")
@@ -916,7 +890,8 @@ Uses `current-date-time-format' for the formatting the date/time."
         :desc "Search line"           "s" #'consult-line
         :desc "Search line (multi)"   "S" #'consult-line-multi
         :desc "Ripgrep search"        "r" #'consult-ripgrep
-        :desc "Git grep search"       "g" #'consult-git-grep
+        :desc "Grep search"           "g" #'consult-grep
+        :desc "Git grep search"       "G" #'consult-git-grep
         :desc "Focus lines"           "f" #'consult-focus-lines
         :desc "Outline / Headings"    "o" #'consult-outline
         :desc "Imenu (Symbols)"       "i" #'consult-imenu
@@ -926,83 +901,92 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
+;;; РАБОТА С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ
+
+
+(setq help-window-select        t)
+(setq help-window-keep-selected t)
+
+(setq woman-fill-frame nil)
+
+;; Отключаем лишние подсказки в мини-буфере
+(setq echo-keystrokes-help nil)
+
+
+;;; Настройка открытия некоторых вспомогательный буферов.
+;; Так-как `display-buffer-alist' не всегда срабатывает как хотелось бы,
+;; чуть ниже добавлен паке `current-window-only'.
+
+
+;; Заставляет Man использовать текущее окно.
+;; не подчиняется `display-buffer-alist':
+(setq Man-notify-method 'pushy)
+
+(with-eval-after-load 'woman
+  (add-to-list 'display-buffer-alist
+	       '("\\*WoMan .*\\*"
+	         (display-buffer-same-window)
+	         (post-command-select-window . t)
+	         )))
 
 
 
+(with-eval-after-load 'apropos
+  (add-to-list 'display-buffer-alist
+               '((major-mode . apropos-mode)
+                 (display-buffer-same-window)
+                 (post-command-select-window . t)))
+  )
 
 
-;;; БЛОК МИНИБУФЕРА, ПОИСКА, ПОДСКАЗОК, СОРТИРОВКИ И ОТОБРАЖЕНИЯ РЕЗУЛЬТАТОВ  ЗАКОНЧИЛСЯ
+(with-eval-after-load 'helpful
+  (add-to-list 'display-buffer-alist
+               '((major-mode . helpful-mode)
+                 (display-buffer-same-window)
+                 (post-command-select-window . t)))
+  )
 
 
+;;; current-window-only:
+(use-package! current-window-only
+  :config
+  (message "Загрузка \"current-window-only\"")
+  (current-window-only-mode t)
+  )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;                                                                         ;;;
-;;;      РАБОТА С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ        ;;;
-;;;                                                                         ;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (setq help-window-select                        t
-;;       apropos-do-all                            t
-;;       apropos-sort-by-scores                    t
-;;       apropos-documentation-sort-by-scores      nil)
-
-
-;; ;; `🡇' Этот код должен был бы указанные буферы (Apropos, Help и так далее)
-;; ;; заставлять открываться строго в текущем окне, но что-то не так сработало
-;; ;; и они открываются справа, что, в общем-то, не так плохо:
-;; (setq display-buffer-alist
-;;       (append
-;;        '(("\\*\\(Apropos\\|Help\\|Messages\\|Man\\|Process List\\|grep\\|occur\\|flymake\\|project-.*\\)\\*"
-;;           display-buffer-same-window
-;;           (inhibit-same-window . nil)))
-;;        display-buffer-alist))
-;; ;; Чтобы наши настройки `display-buffer-same-window' `🡅' работали в Doom Emacs без конфликтов,
-;; ;; нужно «успокоить» встроенную систему `popup'.
-;; ;; Doom использует макрос set-popup-rule!, который имеет приоритет над обычным display-buffer-alist.
-;; ;; :ignore t  заставит Doom игнорировать их и использовать стандартную логику (нашу `display-buffer-alist'):
-;; (set-popup-rules!
-;;   '(("^\\*\\(Apropos\\|Help\\|Messages\\|Man\\|grep\\|occur\\)\\*" :ignore t)
-;;     ("^\\*project-" :ignore t)))
-
-
-;; ;; Открываем vterm сбоку:
-;; (add-to-list 'display-buffer-alist
-;;              (append
-;;               '("\\*vterm\\*"
-;;                 (display-buffer-in-side-window)
-;;                 (side . right)          ;; Можно заменить на left, top или bottom
-;;                 (window-width . 0.5))   ;; Занимает 50% ширины экрана
-;;               display-buffer-alist))
 
 
 (vimish-fold-global-mode 1)
 
 
-(bind-key "M-0"         'kill-current-buffer global-map)
-(bind-key "C-d - 1"     'kill-current-buffer global-map)
-;; в «konsole» и «yakuake» "M-0" не работае;
+(map! :map global-map "M-0"     'kill-current-buffer)
+;; в «konsole» и «yakuake» "M-0" не работает;
 ;; Эта клавиша будет работать только в терминале:
 (unless (display-graphic-p)
-  (map! "C-d - 1" #'kill-current-buffer))
-
+  (map! "C-d - 1" 'kill-current-buffer))
 
 ;; window.el
 ;; (bind-key "M-1"     'delete-other-windows)
 ;; (bind-key "M-2"     'other-window)
 (use-package! window
-  :bind
-  (("M-1"   .   delete-other-windows)
-   ("M-2"   .   other-window)
-   ("C-x |"  .   my/toggle-window-split)
+  ;; :bind
+  ;; (
+  ;;  ("M-1"   .   delete-other-windows)
+  ;;  ("M-2"   .   other-window)
+  ;;  ("C-x |"  .   my/toggle-window-split)
 
-   :map global-map
-   ;; "C-x 3"
-   ([remap split-window-right]  .   my/split-window-right))
+  ;;  :map global-map
+  ;;  ;; "C-x 3"
+  ;;  ([remap split-window-right]  .   my/split-window-right)
+  ;;  )
 
   :config
   (message "Загрузка built-in \"window\"")
-
+  (map! "M-1"   #'delete-other-windows)
+  (map! "M-2"   #'other-window)
+  (map! "C-x |" #'my/toggle-window-split)
+  ;; :g сокращение для global-map
+  (map! :g [remap split-window-right] #'my/split-window-right)
 
   ;; my/split-window-right ("C-x 3")
   (defun my/split-window-right ()
@@ -1046,7 +1030,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   )
 
 
-;;; https://github.com/jdburgosr/softresize
+;;; softresize:
 ;; Изменение размера фреймов:
 (use-package! softresize
   :bind
@@ -1123,8 +1107,10 @@ Uses `current-date-time-format' for the formatting the date/time."
         (kill-buffer buffer)
         (message "File '%s' successfully removed" filename)))))
 
-(bind-key "C-d - 0" 'my/delete-current-buffer-file)
-
+;; (bind-key "C-d - 0" 'my/delete-current-buffer-file)
+(map! "C-d - 0" #'my/delete-current-buffer-file)
+;; (map! :prefix "C-d"
+;;       "- 0" #'my/delete-current-buffer-file)
 
 ;;; Kill all other buffers
 ;; my/kill-other-buffers ("C-d - o")
@@ -1134,7 +1120,8 @@ Uses `current-date-time-format' for the formatting the date/time."
   (mapc 'kill-buffer (delq (current-buffer) (buffer-list)))
   (message "Kill all other buffers"))
 
-(bind-key "C-d - o" 'my/kill-other-buffers)
+;; (bind-key "C-d - o" 'my/kill-other-buffers)
+(map! "C-d - o" #'my/kill-other-buffers)
 
 
 ;;; Kill all buffers, leaving *scratch* only
@@ -1148,7 +1135,8 @@ Uses `current-date-time-format' for the formatting the date/time."
      (message "Kill all buffers, leaving *scratch* only."))
    (buffer-list)))
 
-(bind-key "C-d - a" 'my/kill-all-buffers)
+;; (bind-key "C-d - a" 'my/kill-all-buffers)
+(map! "C-d - a" #'my/kill-all-buffers)
 
 
 
