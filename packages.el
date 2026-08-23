@@ -65,4 +65,12 @@
  :recipe (:host github :repo "jdburgosr/softresize"))
 (package! free-keys)
 (package! symbol-overlay)
-(package! current-window-only)
+
+;;; У этого пакета обнаружилась досадная побочка - она блокирует
+;; стандартную функцию `delete-other-windows', которой я часто пользуюсь.
+;; (package! current-window-only)
+
+(package! occur-x)
+(package! visual-regexp)
+(package! visual-regexp-steroids)
+(package! volatile-highlights)

@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Среда марта 4 15:56:13 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Воскресенье августа 23 21:14:27 MSK 2026>
 
 
 ;;; Commentary:
@@ -275,7 +275,7 @@
 (auto-compression-mode      t)
 
 
-;;; font-lock.el
+;; font-lock.el
 (use-package! font-lock
   :config
   (message "Загрузка встроенного модуля \"font-lock\"")
@@ -346,12 +346,15 @@
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 ;; (add-hook 'before-save-hook #'whitespace-cleanup)
 
+
+;;; backup-walker
 (use-package! backup-walker
   :commands (backup-walker-start)
   :config
   (message "Загрузка \"backup-walker\""))
 
 
+;;; backup-each-save
 (use-package backup-each-save
   :hook
   (after-save . backup-each-save)
@@ -414,12 +417,46 @@
 
 
 
-(save-place-mode        1)
-;; (desktop-save-mode   t)
+(after! recentf
+  (setq recentf-exclude
+        '(;; Исключить системные и временные папки Doom Emacs
+          "~/.config/doom/.local/"
+          "~/.config/emacs/.local/"
+          "~/.emacs.d/.local/"
+          "/tmp/"
+          "/dev/"
+
+          ;; Исключить конкретные расширения файлов (например, картинки и бинарники)
+          "\\.png\\'"
+          "\\.jpg\\'"
+          "\\.pdf\\'"
+          "\\.elc\\'"
+
+          ;; Исключить папки внутри проектов (например, кэш питона или node_modules)
+          "\\.git/"
+          "node_modules/"
+          "\\.venv/"
+          "__pycache__/"
+
+          ;; Исключить конкретный файл (например, вашу историю команд или секреты)
+          "~/.emacs.d/.local/etc/history"
+          "~/.config/doom/secrets.el")))
 
 
 
-;;; ЛОКАЛЬ, ВРЕМЯ
+
+
+(save-place-mode     1)
+(desktop-save-mode   t)
+
+
+
+
+
+
+
+
+;;;; >>>>>>>>> ЛОКАЛЬ, ВРЕМЯ
 
 ;; Чтобы не возникало ниже написанного:
 ;; "Warning (yasnippet): ‘lexical-binding-Time-stamp’ modified buffer in a backquote expression.
@@ -428,7 +465,7 @@
 (add-to-list 'warning-suppress-types '(yasnippet backquote-change))
 
 
-;;; insert date and time
+;;; Вставляем дату и время.
 ;; my/insert-current-date-time ("C-c t d")
 ;; my/insert-current-time ("C-c t t")
 ;; recode-region ("C-x RET R")
@@ -536,9 +573,10 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;; ПЕРЕМЕЩЕНИЕ, ПОИСК
+;;;; ПЕРЕМЕЩЕНИЕ
 
 
+;;; paren
 (use-package! paren
   :config
   (message "Загрузка встроенного модуля \"paren\"")
@@ -594,8 +632,19 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;   )
 
 
+(after! dirvish
+  (setq dirvish-quick-access-entries
+        '(("h" "~/"                   "Home")
+          ("d" "~/.config/doom/"      "~/.config/doom/")
+          ("e" "~/.config/emacs/"     "~/.config/emacs/")))
 
-;;; РЕДАКТИРОВАНИЕ.
+  (map! :map dirvish-mode-map
+        :g "M-b" #'dirvish-quick-access))
+
+
+
+
+;;;; РЕДАКТИРОВАНИЕ.
 
 ;; Если значение переменной sentence-end равно nil (по умолчанию),
 ;; Emacs вычисляет конец предложения динамически на основе sentence-end-double-space.
@@ -629,7 +678,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 (map! "C-x <down>" #'duplicate-dwim)
 
 
-;; indent buffer-region
+;;; indent buffer-region
 ;; https://github.com/djui/dot-files/blob/master/dot-emacs ****************
 ;; my/indent-region-or-buffer ("C-M-\\")
 (defun my/indent-buffer ()
@@ -705,11 +754,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-(with-eval-after-load 'corfu
-  (setq tab-always-indent nil))
-
-
-
 
 ;;; МИНИБУФЕР, ПОИСК, АВТОДОПОЛНЕНИЕ.
 ;; vertico - это современный и минималистичный интерфейс для автодополнения в минибуфере.
@@ -721,7 +765,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;; orderless   - позволяет искать компоненты запроса в любом порядке через пробел.
 ;; consult     - предоставляет полезные команды поиска (например, consult-line вместо Swiper или consult-buffer).
 ;; marginalia  - добавляет полезные пояснения в список кандидатов (права доступа к файлам, описания функций).
-;; позволяет      - embark вызывать контекстные действия для выбранного кандидата (например, удалить файл прямо из списка поиска).
+;;              позволяет embark вызывать контекстные действия для выбранного кандидата (например, удалить файл прямо из списка поиска).
 ;;
 ;;
 ;; corfu - это современный и минималистичный интерфейс для автодополнения в тексте (completion-at-point) для Emacs.
@@ -730,7 +774,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;     в терминале M-x `completion-at-point' или `C-M-i'
 ;;     Не забываем:
 ;;     M-x `nerd-icons-install-fonts'
-
 
 
 ;; МИНИБУФЕР
@@ -747,8 +790,7 @@ Uses `current-date-time-format' for the formatting the date/time."
 (map! :map mode-specific-map "C-g" #'minibuffer-keyboard-quit)  ; abort recursive edit
 
 
-;;; vertico-multiform - позволяет вам настраивать Vertico
-;;; для каждой команды или для каждой категории завершения.
+;;; vertico-multiform - позволяет вам настраивать Vertico для каждой команды или для каждой категории завершения.
 (after! vertico
   (use-package! vertico-multiform
     :config
@@ -835,10 +877,11 @@ Uses `current-date-time-format' for the formatting the date/time."
 (with-eval-after-load 'orderless
   (message "Загрузка \"orderless\"")
 
-  (setq orderless-matching-styles '(orderless-regexp
-                                    orderless-literal
-                                    ;; Добавляет fuzzy-поиск
+  (setq orderless-matching-styles '(orderless-initialism
+                                    orderless-prefixes
                                     ;; orderless-flex
+                                    orderless-regexp
+                                    orderless-literal
                                     ))
   ;; Чтобы не использовать постоянно flex (fuzzy) поиск будет использована функция,
   ;; которая включает flex (fuzzy) поиск,когда ставишь в конце запроса `~':
@@ -851,8 +894,18 @@ Uses `current-date-time-format' for the formatting the date/time."
      ((string-prefix-p "!" pattern)
       `(orderless-not . ,(substring pattern 1)))))
 
-  (setq orderless-style-dispatchers '(my/orderless-dispatch)
-        ))
+  (setq orderless-style-dispatchers '(my/orderless-dispatch))
+
+  ;; Разрешаем поиску смотреть в текстовые аннотации (включая горячие клавиши)
+  ;; (setq orderless-component-separator #'split-string-and-unquote)
+
+  )
+
+
+
+
+(with-eval-after-load 'corfu
+  (setq tab-always-indent nil))
 
 
 
@@ -866,23 +919,38 @@ Uses `current-date-time-format' for the formatting the date/time."
     (corfu-terminal-mode +1)))
 
 
-;;; Нужно разобраться.
-;; (after! embark
-;;   (global-set-key (kbd "C-:") 'embark-dwim)
-;;   (global-set-key (kbd "C-*") 'embark-select)
-
-;;   (define-key minibuffer-local-map (kbd "M-.") #'my/embark-preview)
-;;   (defun my/embark-preview ()
-;;     "Previews candidate in vertico buffer, unless it's a consult command"
-;;     (interactive)
-;;     (unless (bound-and-true-p consult--preview-function)
-;;       (save-selected-window
-;;         (let ((embark-quit-after-action nil))
-;;           (embark-dwim))))))
 
 
 
-;;; consult:
+(after! embark
+  ;; Кастомная функция превью (перенесена внутрь after!, чтобы Emacs видел embark-dwim)
+  (defun my/embark-preview ()
+    "Previews candidate in vertico buffer, unless it's a consult command"
+    (interactive)
+    (unless (bound-and-true-p consult--preview-function)
+      (save-selected-window
+        (let ((embark-quit-after-action nil))
+          (embark-dwim))))))
+
+;; Назначаем горячие клавиши в стиле Doom Emacs
+(map! :g "C-:" #'embark-dwim
+      :g "C-*" #'embark-select
+      :map minibuffer-local-map "M-." #'my/embark-preview)
+
+
+(after! embark
+  (setq display-buffer-alist
+        (cons '("Embark Export"
+                (display-buffer-in-side-window)
+                (side . right)
+                (window-width . 0.5)
+                (dedicated . t))
+              display-buffer-alist)))
+
+
+
+
+;;;; consult:
 (use-package! consult
   :config
   (message "Загрузка \"consult\"")
@@ -899,28 +967,226 @@ Uses `current-date-time-format' for the formatting the date/time."
         :desc "Global mark"           "M" #'consult-global-mark)
   )
 
+;; Команда consult-outline для построения списка заголовков (`consult-outline`) опирается на стандартную переменную Emacs outline-regexp.
+;; В современных версиях Doom Emacs (особенно в пакетах для работы с Lisp, Emacs Lisp и Clojure) разработчики обновили настройки по умолчанию.
+;; Теперь регулярное выражение ищет не только крупные комментарии, но и любые открывающие скобки определений
+;; вроде (`defun', (`setq', (`use-package'.
+;; Чтобы вернуть старое строгое поведение и видеть в `consult-outline' исключительно ваши кастомные комментарии-заголовки ;;; и ;;;;,
+;; добавьте глобальное исправление для Emacs Lisp (Рекомендуется).
+;; Этот хук будет принудительно перезаписывать правила поиска заголовков каждый раз, когда вы открываете файл конфигурации .el.
+;; Он заставит consult-outline реагировать только на три или четыре точки с запятой:
+;; (add-hook! 'emacs-lisp-mode-hook
+;;   (setq-local outline-regexp ";\\{3,4\\} "))     ; Здраво рассудив, решил, что настройка по-умолчанию лучше.
 
 
-;;; РАБОТА С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ
+
+;;; occur-x.el
+;; occur-x - действует в буфере occur
+;;      "k" keep    `occur-x-filter'
+;;      "f" flush   `occur-x-filter-out'
+;;      "u" to undo `occur-x-undo-filter'
+(use-package! occur-x
+  :hook (occur-mode . turn-on-occur-x-mode)
+  :config
+  (message "Загрузка \"occur-x\""))
+
+
+(use-package! visual-regexp-steroids
+  :defer t
+  :commands (vr/isearch-backward
+             vr/isearch-forward
+             vr/replace
+             vr/query-replace)
+  :preface
+  (defun my/vr/query-replace-from-beginning ()
+    "Запускает vr/query-replace с самого начала буфера."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (call-interactively #'vr/query-replace)))
+  :config
+  (message "Loading \"visual-regexp & visual-regexp-steroids\""))
+
+;; Правильные бинды в стиле Doom Emacs (через general.el / map!)
+(map! :g "M-s C-r" #'vr/isearch-backward
+      :g "M-s C-s" #'vr/isearch-forward
+      :g "M-s M-%" #'my/vr/query-replace-from-beginning
+      ;; Ремапим стандартные команды Emacs
+      :g [remap query-replace-regexp] #'vr/replace
+      :g [remap query-replace]        #'vr/query-replace)
+
+
+;;; anzu.el
+;;     `anzu-isearch-query-replace'
+;;     `anzu-isearch-query-replace-regexp'
+;;     `anzu-query-replace'
+;;     `anzu-query-replace-at-cursor'
+;;     `anzu-query-replace-at-cursor-thing'
+;;     `anzu-query-replace-regexp'
+;;     `anzu-replace-at-cursor-thing'
+(use-package! anzu
+  :defer t
+  :init
+  ;; Включаем режим сразу при старте, как в вашем закомментированном хуке
+  ;; (global-anzu-mode 1)
+  :config
+  (message "Загрузка \"anzu\"")
+
+  ;; Настройки переменных через чистый setq вместо громоздкого custom-set-variables
+  (setq anzu-mode-lighter " Az "
+        anzu-deactivate-region t
+        anzu-search-threshold 1000
+        anzu-replace-threshold 50
+        anzu-replace-to-string-separator " => ")
+
+  ;; Кастомная функция отображения статуса
+  (defun my/anzu-update-func (here total)
+    (when anzu--state
+      (let ((status (cl-case anzu--state
+                      (search (format "<%d/%d>" here total))
+                      (replace-query (format "(%d Replaces)" total))
+                      (replace (format "<%d/%d>" here total)))))
+        (propertize status 'face 'anzu-mode-line))))
+
+  ;; Привязываем функцию обновления
+  (setq anzu-mode-line-update-function #'my/anzu-update-func)
+
+  ;; Настройка цвета шрифта в стиле Doom Emacs (переживет смену тем оформления)
+  (custom-set-faces!
+    '(anzu-mode-line :foreground "red" :weight bold)))
+
+
+
+;;;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+;;;                                                      >>>
+;;;                     ПОДСВЕТКА                        >>>
+;;;                     HIGHLIGHT                        >>>
+;;;>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+;;; === Настройка VOLATILE-HIGHLIGHTS (Вспышка при вставке/удалении) ===
+(use-package! volatile-highlights
+  :custom
+  ;; Animation: choose one of 'static, 'fade-in, or 'pulse
+  (vhl/animation-style 'fade-in)
+  :init
+  ;; Включаем режим сразу при старте Emacs
+  (volatile-highlights-mode         1)
+  (setq vhl/highlight-zero-width-ranges  t)
+  :config
+  (message "Загрузка \"volatile-highlights\"")
+
+  (setopt vhl/animation-mid-frames 4
+          vhl/animation-frame-interval 0.03)
+
+  ;; Включаем расширения для отслеживания вырезания (kill) и удаления (delete)
+  (vhl/ext/kill/on)
+  (vhl/ext/delete/on)
+
+  (vhl/ext/undo/on)
+  (vhl/ext/yank/on)
+
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;; HIGHLIGHT ends here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;;; РАБОТА С ОКНАМИ, ФРЕЙМАМИ, БУФЕРАМИ, ФАЙЛАМИ И ДИРЕКТОРИЯМИ
 
 
 (setq help-window-select        t)
 (setq help-window-keep-selected t)
 
-(setq woman-fill-frame nil)
 
 ;; Отключаем лишние подсказки в мини-буфере
 (setq echo-keystrokes-help nil)
 
+(setq Man-notify-method 'pushy)
+
+(setq switch-to-buffer-obey-display-actions t)
 
 ;;; Настройка открытия некоторых вспомогательный буферов.
 ;; Так-как `display-buffer-alist' не всегда срабатывает как хотелось бы,
-;; чуть ниже добавлен паке `current-window-only'.
-
-
-;; Заставляет Man использовать текущее окно.
-;; не подчиняется `display-buffer-alist':
-(setq Man-notify-method 'pushy)
+;; чуть ниже добавлен пакет `current-window-only'.
 
 (with-eval-after-load 'woman
   (add-to-list 'display-buffer-alist
@@ -929,6 +1195,13 @@ Uses `current-date-time-format' for the formatting the date/time."
 	         (post-command-select-window . t)
 	         )))
 
+
+(with-eval-after-load 'man
+  (add-to-list 'display-buffer-alist
+	       '("\\*Man .*\\*"
+	         (display-buffer-same-window)
+	         (post-command-select-window . t)
+	         )))
 
 
 (with-eval-after-load 'apropos
@@ -946,13 +1219,19 @@ Uses `current-date-time-format' for the formatting the date/time."
                  (post-command-select-window . t)))
   )
 
+(set-popup-rule! "^\\*Messages\\*" :ignore t)
 
-;;; current-window-only:
-(use-package! current-window-only
-  :config
-  (message "Загрузка \"current-window-only\"")
-  (current-window-only-mode t)
-  )
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -965,10 +1244,24 @@ Uses `current-date-time-format' for the formatting the date/time."
 (unless (display-graphic-p)
   (map! "C-d - 1" 'kill-current-buffer))
 
-;; window.el
+
+
+;; (defun delete-other-windows-force ()
+;;   (interactive)
+;;   (let ((override #'current-window-only--delete-other-windows))
+;;     (advice-remove 'delete-other-windows override)
+;;     (delete-other-windows)
+;;     (advice-add 'delete-other-windows :override override)))
+
+
+
+;;; window.el
 ;; (bind-key "M-1"     'delete-other-windows)
 ;; (bind-key "M-2"     'other-window)
 (use-package! window
+  ;; :bind добавляем при наличии bind-key.
+  ;; Я же недавно переписал конфиг под general.el,
+  ;; который используется в doomemacs по-умолчанию.
   ;; :bind
   ;; (
   ;;  ("M-1"   .   delete-other-windows)
@@ -986,7 +1279,7 @@ Uses `current-date-time-format' for the formatting the date/time."
   (map! "M-2"   #'other-window)
   (map! "C-x |" #'my/toggle-window-split)
   ;; :g сокращение для global-map
-  (map! :g [remap split-window-right] #'my/split-window-right)
+  (map! :g [remap split-window-right] #'my/split-window-right)  ; "C-x 3"
 
   ;; my/split-window-right ("C-x 3")
   (defun my/split-window-right ()
@@ -1063,8 +1356,7 @@ Uses `current-date-time-format' for the formatting the date/time."
                    name (file-name-nondirectory new-name)))))))
 
 
-;;; Копирует абсолютный путь к файлу и имя файла.
-;; my/copy-full-file-name-to-clipboard ()
+;;; Копирует абсолютный путь к файлу и имя файла - my/copy-full-file-name-to-clipboard ()
 (defun my/copy-full-file-name-to-clipboard ()
   "Копирует абсолютный путь к файлу и имя файла."
   (interactive)
@@ -1076,8 +1368,7 @@ Uses `current-date-time-format' for the formatting the date/time."
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
 
-;;; Копирует имя файла без директории.
-;; my/copy-buffer-file-name-nondirectory ()
+;;; Копирует имя файла без директории - my/copy-buffer-file-name-nondirectory ()
 (defun my/copy-buffer-file-name-nondirectory ()
   "Копирует имя файла."
   (interactive)
@@ -1140,8 +1431,8 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-;;; Взято у `xuchunyang'
-;; Записанное в scratch не удаляется после выхода.
+;;; Записанное в scratch не удаляется после выхода.
+;; Взято у `xuchunyang'
 (use-package! chunyang-scratch
   :defer t
   :preface
@@ -1177,6 +1468,10 @@ Uses `current-date-time-format' for the formatting the date/time."
 ;;;                                                                         ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
 
 
 

@@ -1,7 +1,7 @@
 ;;; my_ui/key/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:12:28 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Суббота февраля 28 22:49:31 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Среда августа 12 17:40:15 MSK 2026>
 
 
 
@@ -18,7 +18,7 @@
 
     :bind (("<f6> b" . my/describe-personal-keybindings))
     :config
-    (message "Loading \"bind-key\"")
+    (message "Загрузка \"bind-key\"")
     (setq bind-key-describe-special-forms t)
     ))
 
@@ -30,7 +30,7 @@
     ;; :hook
     ;; (after-init . which-key-mode)
     :config
-    (message "Loading \"which-key\"")
+    (message "Загрузка \"which-key\"")
     ;; default
 
     (which-key-setup-side-window-right-bottom)
