@@ -1,5 +1,4 @@
-;; -*- no-byte-compile: t; -*-
-;;; $DOOMDIR/packages.el
+;;; $DOOMDIR/packages.el -*- lexical-binding: t; no-byte-compile: t -*-
 
 ;; To install a package:
 ;;
@@ -53,6 +52,7 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
 
+
 (package! bind-key)
 (package! reverse-im)     ; пакет решает проблему русской раскладки.
 (package! vertico-prescient)
@@ -74,3 +74,4 @@
 (package! visual-regexp)
 (package! visual-regexp-steroids)
 (package! volatile-highlights)
+

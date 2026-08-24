@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Воскресенье августа 23 21:14:27 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Понедельник августа 24 19:30:58 MSK 2026>
 
 
 ;;; Commentary:
@@ -276,25 +276,24 @@
 
 
 ;; font-lock.el
-(use-package! font-lock
-  :config
-  (message "Загрузка встроенного модуля \"font-lock\"")
-  ;; (jit-lock-debug-mode)
-  (setq-default font-lock-multiline           t
-                font-lock-maximum-decoration  t
-                ;; Указывает, какой вспомогательный механизм использовать
-                ;; для оптимизации отрисовки. JIT расшифровывается как Just-In-Time.
-                ;; Вместо того чтобы подсвечивать весь файл сразу (что «повесило» бы Emacs
-                ;; на огромных файлах), jit-lock-mode подсвечивает только ту часть текста,
-                ;; которую вы видите на экране прямо сейчас.
-                ;; Это стандарт де-факто в современном Emacs.
-                font-lock-support-mode        'jit-lock-mode
-                ;; jit-lock-chunk-size           1000
-                ;; jit-lock-defer-time           0.04
-                ;; jit-lock-stealth-time         16
-                )
-  ;; (global-font-lock-mode)
-  )
+;; (use-package! font-lock
+;;   :config
+;;   (message "Загрузка встроенного модуля \"font-lock\"")
+;;   ;; (jit-lock-debug-mode)
+;;   (setq-default font-lock-multiline           t
+;;                 font-lock-maximum-decoration  t
+;;                 ;; Указывает, какой вспомогательный механизм использовать
+;;                 ;; для оптимизации отрисовки. JIT расшифровывается как Just-In-Time.
+;;                 ;; Вместо того чтобы подсвечивать весь файл сразу (что «повесило» бы Emacs
+;;                 ;; на огромных файлах), jit-lock-mode подсвечивает только ту часть текста,
+;;                 ;; которую вы видите на экране прямо сейчас.
+;;                 ;; Это стандарт де-факто в современном Emacs.
+;;                 font-lock-support-mode        'jit-lock-mode
+;;                 ;; jit-lock-chunk-size           1000
+;;                 ;; jit-lock-defer-time           0.04
+;;                 ;; jit-lock-stealth-time         16
+;;                 )
+;;   )
 
 
 ;; If you use `org' and don't want your org files in the default location below,
@@ -642,6 +641,19 @@ Uses `current-date-time-format' for the formatting the date/time."
         :g "M-b" #'dirvish-quick-access))
 
 
+(after! dired
+  ;; Включаем встроенную функцию замены буфера (по умолчанию она отключена)
+  (put 'dired-find-alternate-file 'disabled nil)
+
+  ;; Переназначаем клавиши для классической раскладки (Emacs-mode)
+  (map! :map dired-mode-map
+        :g "<return>" #'dired-find-alternate-file
+        :g "M-f"        #'dired-find-alternate-file))
+
+(after! dired
+  (map! :map dired-mode-map
+        :g "^" (lambda () (interactive) (find-alternate-file ".."))))
+
 
 
 ;;;; РЕДАКТИРОВАНИЕ.
@@ -667,7 +679,7 @@ Uses `current-date-time-format' for the formatting the date/time."
               )
 
 
-(+global-word-wrap-mode +1)
+;; (+global-word-wrap-mode +1)
 (setq +word-wrap-extra-indent 'double) ; варианты: 'single, 'double или число
 
 
