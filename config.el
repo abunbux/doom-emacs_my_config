@@ -1,7 +1,7 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;;; CREATED: <Пн фев 16 19:10:11 MSK 2026>
-;;; Time-stamp: <Последнее обновление -- Понедельник августа 24 19:30:58 MSK 2026>
+;;; Time-stamp: <Последнее обновление -- Вторник августа 25 11:48:22 MSK 2026>
 
 
 ;;; Commentary:
@@ -346,6 +346,10 @@
 ;; (add-hook 'before-save-hook #'whitespace-cleanup)
 
 
+(global-whitespace-mode -1)
+
+
+
 ;;; backup-walker
 (use-package! backup-walker
   :commands (backup-walker-start)
@@ -360,19 +364,19 @@
   :init
   (defun backup-each-save-filter (filename)
     (let ((ignored-filenames
-    	   '("\\/cache/auto-save-list"
+           '("\\/cache/auto-save-list"
              "\\/cache/cache/backup"
              "\\/cache/undo-tree-history"
              "^/tmp"
              "semantic.cache$"
              "\\.emacs-places$"
-    	     "\\.recentf$"
+             "\\.recentf$"
              ".newsrc\\(\\.eld\\)?"))
-    	  (matched-ignored-filename nil))
+          (matched-ignored-filename nil))
       (mapc
        (lambda (x)
          (when (string-match x filename)
-    	   (setq matched-ignored-filename t)))
+           (setq matched-ignored-filename t)))
        ignored-filenames)
       (not matched-ignored-filename)))
 
@@ -382,6 +386,125 @@
   (message "Загрузка \"backup-each-save\"")
   ;; (add-hook 'after-save-hook 'backup-each-save)
   )
+
+
+
+(after! which-key
+  (use-package! which-key
+    ;; :hook
+    ;; (after-init . which-key-mode)
+    :config
+    (message "Загрузка \"which-key\"")
+    ;; default
+
+    (which-key-setup-side-window-right-bottom)
+    (setq which-key-allow-imprecise-window-fit          t)
+    (setq which-key-max-description-length              45)
+    (setq which-key-side-window-max-width               0.75)
+    (setq which-key-show-prefix                         'top)
+    ;; (setq which-key-separator                        " ")
+    (setq which-key-sort-order                          'which-key-key-order)
+
+    ;; (require 'which-key)
+
+    (setq which-key-highlighted-command-list
+          '(
+            ("consult-*"    . ((t (:inherit default :foreground "green"))))
+            ;; ;; ("\\`swiper-"     . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`swiper"      . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`ivy-"        . ((t (:inherit default :foreground "seashell1"))))
+            ;; ;; ("\\`helm-command-prefix" . ((t (:inherit default :weight bold :foreground "yellow"))))
+            ;; ;; ("\\`helm-"       . ((t (:inherit default :foreground "red"))))
+            ;; ;; ("-helm"          . ((t (:inherit default :foreground "red"))))
+            ;; ("bookmark"       . ((t (:inherit default :foreground "hot pink"))))
+            ;; ;; Highlight using the default `which-key-highlighted-command-face'
+            ;; ("register"       . ((t (:inherit default :foreground "DeepSkyBlue"))))
+            ;; ("rectangle-"     . ((t (:inherit default :foreground "LimeGreen"))))
+            ;; ("-rectangle"     . ((t (:inherit default :foreground "LimeGreen"))))
+
+            ;; ("hlt-"           . ((t (:inherit default :foreground "green"))))
+            ;; ("highlight-regexp"                 . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-phrase"                 . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("unhighlight-regexp"               . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("hi-lock-"                         . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-lines-matching-regexp"  . ((t (:inherit default :foreground "IndianRed1"))))
+            ;; ("highlight-symbol-"                . ((t (:inherit default :foreground "#ab82ff"))))
+
+            ;; ("loccur"  . ((t (:inherit default :foreground "RosyBrown1"))))
+
+            ;; ("dired-narrow"         . ((t (:inherit default :foreground "goldenrod1"))))
+
+
+            ;; ("find-dired"           . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("find-grep-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("find-name-dired"      . ((t (:inherit default :foreground "SeaGreen1"))))
+            ;; ("dired-do-find"        . ((t (:inherit default :foreground "DeepSkyBlue1"))))
+            ("kill"                 . ((t (:inherit default :foreground "red"))))
+            ("delete"               . ((t (:inherit default :foreground "red"))))
+            ("sudo"                 . ((t (:inherit default :foreground "red"))))
+            ))
+
+
+
+
+
+
+    ;; (set-face-attribute 'which-key-command-description-face nil :inherit 'default)
+    ;; (set-face-attribute 'which-key-group-description-face nil :foreground "yellow" :weight 'bold)
+    ;; (custom-set-faces
+    ;;  '(which-key-command-description-face ((t (:inherit default))))
+    ;;  '(which-key-group-description-face ((t (:inherit default :foreground "yellow" :weight bold)))))
+
+
+    (which-key-add-key-based-replacements
+      "C-d -"     "kill/delete------->"
+      ;; "C-d s"     "as root----------->"
+      ;; "C-c g"     "git--------------->"
+      ;; "C-c r"     "recentf----------->"
+      ;; "C-c t"     "insert date/time-->"
+      ;; "C-c &"     "yasnippet--------->"
+      ;; "C-x 8"     "unicode----------->"
+      ;; "C-x @"     "event------------->"
+      ;; "C-x RET"   "locale/coding----->"
+      ;; "C-x C-a"   "edebug------------>"
+      ;; "C-x C-k"   "kmacro-keymap----->"
+      ;; "C-x a"     "abbrev/expand----->"
+      ;; "C-x c h"   "helm info/doc----->"
+      ;; "C-x D"     "dired------------->"
+      ;; "C-x r"     "rect/reg/bookmark->"
+      ;; "C-x t"     "...tab...--------->"
+      ;; "C-x X"     "edebug------------>"
+      ;; "C-x v"     "vc-prefix-map----->"
+      ;; "C-x w"     "highlight--------->"
+      ;; "C-z v"     "vimish-fold------->"
+      ;; "C-z v a"   "vimish for all---->"
+      ;; "M-s a"     "search ag--------->"
+      ;; "M-h b"     "helm-------------->"
+      ;; "M-s d"     "search do ag------>"
+      ;; "M-h h"     "highlight--------->"
+      ;; "M-h l"     "hide/loccur------->"
+      ;; "M-h o"     "org-mode-map------>"
+      ;; "M-m i"     "mc insert--------->"
+      ;; "M-m n"     "mc next----------->"
+      ;; "M-m p"     "mc previous------->"
+      ;; "M-m r"     "mc regions-------->"
+      ;; "M-s f"     "file search------->"
+      ;; "M-s g"     "search grep------->"
+      ;; "M-s s"     "search in files--->"
+      ;; "<f6> c"    "counsel---------->"
+      ;; "<f6> h"    "helpful/helm----->"
+      )
+
+    ))
+
+
+(use-package! free-keys
+  :defer t
+  :commands (free-keys)
+  :config
+  (message "Загрузка \"free-keys\""))
+
+
 
 
 ;;; SAVEHIST, SAVE-PLACE, DESKTOP-SAVE
@@ -396,6 +519,7 @@
                                                   file-name-history
                                                   kill-ring
                                                   mark-ring
+                                                  mark-ring-persisted
                                                   global-mark-ring
                                                   search-ring
                                                   regexp-search-ring
@@ -443,13 +567,17 @@
 
 
 
-
-
 (save-place-mode     1)
 (desktop-save-mode   t)
 
 
-
+;; Поскольку consult лишь отображает встроенные кольца меток Emacs (mark-ring и global-mark-ring), для их очистки нужно обнулить эти переменные:
+(defun my/clear-all-marks ()
+  "Очистить локальные и глобальные метки, обнулив списки Consult."
+  (interactive)
+  (setq mark-ring nil)
+  (setq global-mark-ring nil)
+  (message "Все метки успешно очищены!"))
 
 
 
@@ -525,49 +653,35 @@ Uses `current-date-time-format' for the formatting the date/time."
     (setq char-fold-symmetric t)
     (setq search-default-mode #'char-fold-to-regexp)
     ;; Включить char-fold для обычного поиска (isearch)
-    )
-
-
-;;; reverse-im:
-  (use-package! reverse-im
-    :custom
-    (reverse-im-char-fold t)
-    (reverse-im-cache-file (concat doom-cache-dir "reverse-im-cache.el"))
-    ;; advice read-char to fix commands that use their own shortcut mechanism
-    (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
-    ;; translate these methods
-    (reverse-im-input-methods '("russian-computer"))
-    :config
-    (reverse-im-activate "russian-computer")
-    (message "Загрузка \"reverse-im\""))
-  )
+    ))
 
 
 ;; Хоткеи при русской раскладке
-;; ;; https://www.linux.org.ru/forum/general/9959057?cid=9959379
-;; (defun reverse-input-method (input-method)
-;;   "Build the reverse mapping of single letters from INPUT-METHOD."
-;;   (interactive
-;;    (list (read-input-method-name "Use input method (default current): ")))
-;;   (if (and input-method (symbolp input-method))
-;;       (setq input-method (symbol-name input-method)))
-;;   (let ((current current-input-method)
-;;         (modifiers '(nil (control) (meta) (control meta))))
-;;     (when input-method
-;;       (activate-input-method input-method))
-;;     (when (and current-input-method quail-keyboard-layout)
-;;       (dolist (map (cdr (quail-map)))
-;;         (let* ((to (car map))
-;;                (from (quail-get-translation
-;;                       (cadr map) (char-to-string to) 1)))
-;;           (when (and (characterp from) (characterp to))
-;;             (dolist (mod modifiers)
-;;               (define-key local-function-key-map
-;;                           (vector (append mod (list from)))
-;;                           (vector (append mod (list to)))))))))
-;;     (when input-method
-;;       (activate-input-method current))))
-;; (reverse-input-method 'russian-computer)
+;; https://www.alexkorablev.ru/dev/emacs-got-keys/
+(defun reverse-input-method (input-method)
+  "Build the reverse mapping of single letters from INPUT-METHOD."
+  (interactive
+   (list (read-input-method-name "Use input method (default current): ")))
+  (if (and input-method (symbolp input-method))
+      (setq input-method (symbol-name input-method)))
+  (let ((current current-input-method)
+        (modifiers '(nil (control) (meta) (control meta))))
+    (when input-method
+      (activate-input-method input-method))
+    (when (and current-input-method quail-keyboard-layout)
+      (dolist (map (cdr (quail-map)))
+        (let* ((to (car map))
+               (from (quail-get-translation
+                      (cadr map) (char-to-string to) 1)))
+          (when (and (characterp from) (characterp to))
+            (dolist (mod modifiers)
+              (define-key local-function-key-map
+                (vector (append mod (list from)))
+                (vector (append mod (list to)))))))))
+    (when input-method
+      (activate-input-method current))))
+(reverse-input-method 'russian-computer)
+
 
 
 
@@ -679,7 +793,7 @@ Uses `current-date-time-format' for the formatting the date/time."
               )
 
 
-;; (+global-word-wrap-mode +1)
+(+global-word-wrap-mode +1)
 (setq +word-wrap-extra-indent 'double) ; варианты: 'single, 'double или число
 
 
@@ -967,16 +1081,17 @@ Uses `current-date-time-format' for the formatting the date/time."
   :config
   (message "Загрузка \"consult\"")
   (map! :prefix "C-s"
-        :desc "Search line"           "s" #'consult-line
-        :desc "Search line (multi)"   "S" #'consult-line-multi
-        :desc "Ripgrep search"        "r" #'consult-ripgrep
-        :desc "Grep search"           "g" #'consult-grep
-        :desc "Git grep search"       "G" #'consult-git-grep
-        :desc "Focus lines"           "f" #'consult-focus-lines
-        :desc "Outline / Headings"    "o" #'consult-outline
-        :desc "Imenu (Symbols)"       "i" #'consult-imenu
-        :desc "Jump to mark"          "m" #'consult-mark
-        :desc "Global mark"           "M" #'consult-global-mark)
+        :desc "consult search line"             "s" #'consult-line
+        :desc "consult search line (multi)"     "S" #'consult-line-multi
+        :desc "consult ripgrep search"          "r" #'consult-ripgrep
+        :desc "consult grep search"             "g" #'consult-grep
+        :desc "consult git grep search"         "G" #'consult-git-grep
+        :desc "consult focus lines"             "f" #'consult-focus-lines
+        :desc "consult outline / Headings"      "o" #'consult-outline
+        :desc "consult imenu (symbols)"         "i" #'consult-imenu
+        :desc "consult jump to mark"            "m" #'consult-mark
+        :desc "consult global mark"             "M" #'consult-global-mark
+        :desc "consult register"                "R" #'consult-global-mark)
   )
 
 ;; Команда consult-outline для построения списка заголовков (`consult-outline`) опирается на стандартную переменную Emacs outline-regexp.
@@ -1236,17 +1351,6 @@ Uses `current-date-time-format' for the formatting the date/time."
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 (vimish-fold-global-mode 1)
 
 
@@ -1257,13 +1361,6 @@ Uses `current-date-time-format' for the formatting the date/time."
   (map! "C-d - 1" 'kill-current-buffer))
 
 
-
-;; (defun delete-other-windows-force ()
-;;   (interactive)
-;;   (let ((override #'current-window-only--delete-other-windows))
-;;     (advice-remove 'delete-other-windows override)
-;;     (delete-other-windows)
-;;     (advice-add 'delete-other-windows :override override)))
 
 
 
@@ -1521,6 +1618,74 @@ Uses `current-date-time-format' for the formatting the date/time."
      '(markdown-list-face               ((t (:foreground "mediumpurple"))))
      '(markdown-pre-face                ((t (:foreground "#bd98fe"))))
      )))
+
+
+
+(after! tramp
+  (use-package! tramp
+    :defer t
+    :preface
+
+    (defface find-file-root-header-face
+      '((t (:foreground "white" :background "red3")))
+      "*Face use to display header-lines for files opened as root."
+      :group 'emacs-lisp)
+
+    ;; Если буфер открыт от root - будет светиться вверху большой баннер с предупреждением.
+    (defun find-file-root-header-warning ()
+      "*Display a warning in header line of the current buffer.
+This function is suitable to add to `find-file-hook'."
+      (when (string-equal
+             (file-remote-p (or buffer-file-name default-directory) 'user)
+             "root")
+        (let* ((warning "WARNING: EDITING FILE AS ROOT!")
+               (space (+ 6 (- (window-width) (length warning))))
+               (bracket (make-string (/ space 2) ?-))
+               (warning (concat bracket warning bracket)))
+          (setq header-line-format
+                (propertize  warning 'face 'find-file-root-header-face)))))
+
+    (add-hook 'find-file-hook 'find-file-root-header-warning)
+    (add-hook 'dired-mode-hook 'find-file-root-header-warning)
+
+    :init
+    (setq tramp-default-method        "ssh"
+          tramp-verbose               6)
+
+    (setq gpg-agent-ssh-support t)
+
+    (setq epg-gpg-program "/usr/bin/gpg2")
+    (setq epa-pinentry-mode 'loopback)
+
+    ;; Кэшировать пароль на час
+    (setq password-cache-expiry 3600)
+
+
+    :config
+    (message "Loading built-in \"tramp\"")
+
+
+    (setq auth-sources '("~/.authinfo.gpg" "~/.authinfo"))
+
+    ;; (add-to-list 'tramp-default-method-alist
+    ;;              '("\\`localhost\\'"
+    ;;                "\\`root\\'"
+    ;;                "su"
+    ;;                "sudo"
+    ;;                ""
+    ;;                "abunbux"
+    ;;                "ssh"))
+
+    ;; (use-package tramp-sh
+    ;;   :defer t
+    ;;   :config
+    ;;   (message "Loading built-in \"tramp-sh\"")
+    ;;   (require 'tramp-sh nil t)
+    ;;   (setf tramp-ssh-controlmaster-options (concat "-o SendEnv TRAMP=yes " tramp-ssh-controlmaster-options))
+    ;;   )
+
+    ))
+
 
 
 

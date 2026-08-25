@@ -328,6 +328,10 @@ Semantic, and Ansi-Color faces are included -- and much more...")
    `(comint-highlight-prompt ((,class (:weight bold :foreground "#0000FF" :inherit nil))))
 
 
+   ;; which-key
+   `(which-key-command-description-face ((t (:inherit default))))
+   `(which-key-group-description-face ((t (:inherit default :foreground "yellow" :weight bold))))
+
 
 
 

@@ -53,8 +53,7 @@
 ;; (unpin! t)
 
 
-(package! bind-key)
-(package! reverse-im)     ; пакет решает проблему русской раскладки.
+;; (package! bind-key)    ; в doom emacs вместо этого используется general.el
 (package! vertico-prescient)
 (package! corfu-terminal
   :recipe (:type git
@@ -74,4 +73,3 @@
 (package! visual-regexp)
 (package! visual-regexp-steroids)
 (package! volatile-highlights)
-
